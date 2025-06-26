@@ -1,0 +1,16 @@
+# Core ML/Audio libraries
+torch>=2.0.0
+torchaudio>=2.0.0
+transformers>=4.30.0
+numpy
+librosa
+soundfile
+
+# FastAPI and server
+fastapi
+uvicorn
+python-multipart
+
+# Additional utilities
+scipy
+datasets
