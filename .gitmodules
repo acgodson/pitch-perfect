@@ -1,0 +1,3 @@
+[submodule "ccip-javascript-sdk"]
+	path = ccip-javascript-sdk
+	url = https://github.com/smartcontractkit/ccip-javascript-sdk.git
