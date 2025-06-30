@@ -16,7 +16,7 @@ importers:
         version: 1.6.0(encoding@0.1.13)(ethers@6.14.4)
       '@covalenthq/ai-agent-sdk':
         specifier: ^0.3.0
-        version: 0.3.0(encoding@0.1.13)(graphql@16.11.0)(react@19.1.0)(ws@8.18.2)
+        version: 0.3.0(encoding@0.1.13)(graphql@16.11.0)(react@19.1.0)(ws@8.18.0)
       '@dicebear/collection':
         specifier: ^9.2.2
         version: 9.2.3(@dicebear/core@9.2.3)
@@ -25,25 +25,25 @@ importers:
         version: 9.2.3
       '@elizaos/cli':
         specifier: ^1.0.9
-        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/node@20.19.1)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)
+        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/node@20.19.1)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)
       '@elizaos/core':
         specifier: ^1.0.9
-        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
+        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
       '@elizaos/plugin-anthropic':
         specifier: ^1.0.3
-        version: 1.0.3(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(react@19.1.0)(ws@8.18.2)(zod@3.25.67)
+        version: 1.0.3(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(react@19.1.0)(ws@8.18.0)(zod@3.25.67)
       '@elizaos/plugin-bootstrap':
         specifier: 1.0.15
-        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(whatwg-url@7.1.0)(ws@8.18.2)
+        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(whatwg-url@7.1.0)(ws@8.18.0)
       '@elizaos/plugin-local-ai':
         specifier: 1.0.5
-        version: 1.0.5(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(postcss@8.5.6)(typescript@5.8.3)(ws@8.18.2)(yaml@2.8.0)
+        version: 1.0.5(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(postcss@8.5.6)(typescript@5.8.3)(ws@8.18.0)(yaml@2.8.0)
       '@elizaos/plugin-openai':
         specifier: ^1.0.4
-        version: 1.0.6(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(postcss@8.5.6)(react@19.1.0)(typescript@5.8.3)(ws@8.18.2)(yaml@2.8.0)(zod@3.25.67)
+        version: 1.0.6(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(postcss@8.5.6)(react@19.1.0)(typescript@5.8.3)(ws@8.18.0)(yaml@2.8.0)(zod@3.25.67)
       '@elizaos/plugin-sql':
         specifier: ^1.0.9
-        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)
+        version: 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)
       '@hapi/shot':
         specifier: ^6.0.1
         version: 6.0.1
@@ -103,7 +103,7 @@ importers:
         version: 15.3.4(@babel/core@7.27.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       openai:
         specifier: ^5.8.2
-        version: 5.8.2(ws@8.18.2)(zod@3.25.67)
+        version: 5.8.2(ws@8.18.0)(zod@3.25.67)
       pg:
         specifier: ^8.16.3
         version: 8.16.3
@@ -123,8 +123,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
       viem:
-        specifier: ^2.21.33
-        version: 2.31.4(typescript@5.8.3)(zod@3.25.67)
+        specifier: ^2.21.25
+        version: 2.21.25(typescript@5.8.3)(zod@3.25.67)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -1878,10 +1878,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@noble/ciphers@1.3.0':
-    resolution: {integrity: sha512-2I0gnIVPtfnMw9ee9h1dJG7tp81+8Ob3OJb3Mv37rx5L40/b0i7djjCVvGOVqc9AEIQyvyu1i6ypKdFw8R8gQw==}
-    engines: {node: ^14.21.3 || >=16}
-
   '@noble/curves@1.2.0':
     resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
 
@@ -2845,9 +2841,6 @@ packages:
   '@scure/bip32@1.5.0':
     resolution: {integrity: sha512-8EnFYkqEQdnkuGBVpCzKxyIwDCBLDVj3oiX0EKUFre/tOjL/Hqba1D6n/8RcmaQy4f95qQFrO2A8Sr6ybh4NRw==}
 
-  '@scure/bip32@1.7.0':
-    resolution: {integrity: sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw==}
-
   '@scure/bip39@1.1.1':
     resolution: {integrity: sha512-t+wDck2rVkh65Hmv280fYdVdY25J9YeEUIgn2LG1WM6gxFkGzcksoDiUkWVpVp3Oex9xGC68JU2dSbUfwZ2jPg==}
 
@@ -2856,9 +2849,6 @@ packages:
 
   '@scure/bip39@1.4.0':
     resolution: {integrity: sha512-BEEm6p8IueV/ZTfQLp/0vhw4NPnT9oWf5+28nvmeUICjP99f4vr2d+qc7AVGDDtwRep6ifR43Yed9ERVmiITzw==}
-
-  '@scure/bip39@1.6.0':
-    resolution: {integrity: sha512-+lF0BbLiJNwVlev4eKelw1WWLaiKXw7sSl8T6FvBlWkdX+94aGJ4o8XjUdlyhTCjd8c+B3KT3JfS8P0bLRNU6A==}
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -3424,17 +3414,6 @@ packages:
 
   abitype@1.0.6:
     resolution: {integrity: sha512-MMSqYh4+C/aVqI2RQaWqbvI4Kxo5cQV40WQ4QFtDnNzCkqChm8MuENhElmynZlO0qUy/ObkEUaXtKqYnx1Kp3A==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-      zod: ^3 >=3.22.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-      zod:
-        optional: true
-
-  abitype@1.0.8:
-    resolution: {integrity: sha512-ZeiI6h3GnW06uYDLx0etQtX/p8E24UaHHBj57RSjK7YBFe7iuVn07EDpOeP451D06sF27VOz9JJPlIKJmXgkEg==}
     peerDependencies:
       typescript: '>=5.0.4'
       zod: ^3 >=3.22.0
@@ -5383,11 +5362,6 @@ packages:
     peerDependencies:
       ws: '*'
 
-  isows@1.0.7:
-    resolution: {integrity: sha512-I1fSfDCZL5P0v33sVqeTDSpcstAg/N+wF5HS033mogOVIp4B+oHC7oOCsA3axAbBSGTJ8QubbNmnIRN/h8U7hg==}
-    peerDependencies:
-      ws: '*'
-
   istanbul-lib-coverage@3.2.2:
     resolution: {integrity: sha512-O8dpsF+r0WV/8MNRKfnmrtCWhuKjxrq2w+jpzBL5UZKTi2LeVWnWOmWRxFlesJONmc+wLAGvKQZEOanko0LFTg==}
     engines: {node: '>=8'}
@@ -6204,6 +6178,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-emoji@1.11.0:
     resolution: {integrity: sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==}
@@ -6383,14 +6358,6 @@ packages:
 
   outdent@0.5.0:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
-
-  ox@0.8.1:
-    resolution: {integrity: sha512-e+z5epnzV+Zuz91YYujecW8cF01mzmrUtWotJ0oEPym/G82uccs7q0WDHTYL3eiONbTUEvcZrptAKLgTBD3u2A==}
-    peerDependencies:
-      typescript: '>=5.4.0'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   p-filter@2.1.0:
     resolution: {integrity: sha512-ZBxxZ5sL2HghephhpGAQdoskxplTwr7ICaehZwLIlfL6acuVgZPm8yBNuRAFBGEqtD/hmUeq9eqLg2ys9Xr/yw==}
@@ -7859,14 +7826,6 @@ packages:
       typescript:
         optional: true
 
-  viem@2.31.4:
-    resolution: {integrity: sha512-0UZ/asvzl6p44CIBRDbwEcn3HXIQQurBZcMo5qmLhQ8s27Ockk+RYohgTLlpLvkYs8/t4UUEREAbHLuek1kXcw==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   vite-node@2.1.5:
     resolution: {integrity: sha512-rd0QIgx74q4S1Rd56XIiL2cYEdyWn13cunYBIuqh9mpmQr7gGS0IxXoP8R6OaZtNQQLyXSWbd4rXKYUbhFpK5w==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -8673,16 +8632,16 @@ snapshots:
       picocolors: 1.1.1
       sisteransi: 1.0.5
 
-  '@covalenthq/ai-agent-sdk@0.3.0(encoding@0.1.13)(graphql@16.11.0)(react@19.1.0)(ws@8.18.2)':
+  '@covalenthq/ai-agent-sdk@0.3.0(encoding@0.1.13)(graphql@16.11.0)(react@19.1.0)(ws@8.18.0)':
     dependencies:
       '@ai-sdk/anthropic': 1.2.12(zod@3.25.67)
       '@ai-sdk/google': 1.2.19(zod@3.25.67)
       '@ai-sdk/openai': 1.3.22(zod@3.25.67)
-      '@covalenthq/client-sdk': 2.3.0(graphql@16.11.0)(ws@8.18.2)
+      '@covalenthq/client-sdk': 2.3.0(graphql@16.11.0)(ws@8.18.0)
       ai: 4.3.16(react@19.1.0)(zod@3.25.67)
       commander: 13.1.0
       dotenv: 16.6.1
-      openai: 4.104.0(encoding@0.1.13)(ws@8.18.2)(zod@3.25.67)
+      openai: 4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.67)
       pino: 9.7.0
       pino-pretty: 13.0.0
       typescript: 5.8.3
@@ -8697,10 +8656,10 @@ snapshots:
       - uWebSockets.js
       - ws
 
-  '@covalenthq/client-sdk@2.3.0(graphql@16.11.0)(ws@8.18.2)':
+  '@covalenthq/client-sdk@2.3.0(graphql@16.11.0)(ws@8.18.0)':
     dependencies:
       big.js: 6.2.2
-      graphql-ws: 6.0.5(graphql@16.11.0)(ws@8.18.2)
+      graphql-ws: 6.0.5(graphql@16.11.0)(ws@8.18.0)
     transitivePeerDependencies:
       - '@fastify/websocket'
       - crossws
@@ -8874,13 +8833,13 @@ snapshots:
 
   '@electric-sql/pglite@0.3.4': {}
 
-  '@elizaos/cli@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/node@20.19.1)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)':
+  '@elizaos/cli@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/node@20.19.1)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)':
     dependencies:
       '@anthropic-ai/sdk': 0.54.0
       '@clack/prompts': 0.11.0
-      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
-      '@elizaos/plugin-sql': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)
-      '@elizaos/server': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)
+      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
+      '@elizaos/plugin-sql': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)
+      '@elizaos/server': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)
       bun: 1.2.17
       chokidar: 4.0.3
       commander: 14.0.0
@@ -8952,7 +8911,7 @@ snapshots:
       - utf-8-validate
       - ws
 
-  '@elizaos/core@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)':
+  '@elizaos/core@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)':
     dependencies:
       '@sentry/browser': 9.33.0
       buffer: 6.0.3
@@ -8962,7 +8921,7 @@ snapshots:
       glob: 11.0.3
       handlebars: 4.7.8
       js-sha1: 0.7.0
-      langchain: 0.3.29(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(handlebars@4.7.8)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
+      langchain: 0.3.29(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(handlebars@4.7.8)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
       pdfjs-dist: 5.3.31
       pino: 9.7.0
       pino-pretty: 13.0.0
@@ -8991,11 +8950,11 @@ snapshots:
       - typeorm
       - ws
 
-  '@elizaos/plugin-anthropic@1.0.3(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(react@19.1.0)(ws@8.18.2)(zod@3.25.67)':
+  '@elizaos/plugin-anthropic@1.0.3(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(react@19.1.0)(ws@8.18.0)(zod@3.25.67)':
     dependencies:
       '@ai-sdk/anthropic': 1.2.12(zod@3.25.67)
       '@ai-sdk/ui-utils': 1.2.11(zod@3.25.67)
-      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
+      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
       ai: 4.3.15(react@19.1.0)(zod@3.25.67)
       jsonrepair: 3.12.0
     transitivePeerDependencies:
@@ -9021,10 +8980,10 @@ snapshots:
       - ws
       - zod
 
-  '@elizaos/plugin-bootstrap@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(whatwg-url@7.1.0)(ws@8.18.2)':
+  '@elizaos/plugin-bootstrap@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(whatwg-url@7.1.0)(ws@8.18.0)':
     dependencies:
-      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
-      '@elizaos/plugin-sql': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)
+      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
+      '@elizaos/plugin-sql': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)
       whatwg-url: 7.1.0
     transitivePeerDependencies:
       - '@aws-sdk/client-rds-data'
@@ -9076,9 +9035,9 @@ snapshots:
       - typeorm
       - ws
 
-  '@elizaos/plugin-local-ai@1.0.5(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(postcss@8.5.6)(typescript@5.8.3)(ws@8.18.2)(yaml@2.8.0)':
+  '@elizaos/plugin-local-ai@1.0.5(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(postcss@8.5.6)(typescript@5.8.3)(ws@8.18.0)(yaml@2.8.0)':
     dependencies:
-      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
+      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
       '@huggingface/transformers': 3.6.0
       node-llama-cpp: 3.8.1(typescript@5.8.3)
       nodejs-whisper: 0.2.9
@@ -9117,10 +9076,10 @@ snapshots:
       - ws
       - yaml
 
-  '@elizaos/plugin-openai@1.0.6(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(postcss@8.5.6)(react@19.1.0)(typescript@5.8.3)(ws@8.18.2)(yaml@2.8.0)(zod@3.25.67)':
+  '@elizaos/plugin-openai@1.0.6(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(jiti@2.4.2)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(postcss@8.5.6)(react@19.1.0)(typescript@5.8.3)(ws@8.18.0)(yaml@2.8.0)(zod@3.25.67)':
     dependencies:
       '@ai-sdk/openai': 1.3.22(zod@3.25.67)
-      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
+      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
       ai: 4.3.16(react@19.1.0)(zod@3.25.67)
       js-tiktoken: 1.0.20
       tsup: 8.5.0(jiti@2.4.2)(postcss@8.5.6)(typescript@5.8.3)(yaml@2.8.0)
@@ -9156,10 +9115,10 @@ snapshots:
       - yaml
       - zod
 
-  '@elizaos/plugin-sql@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)':
+  '@elizaos/plugin-sql@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)':
     dependencies:
       '@electric-sql/pglite': 0.3.4
-      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
+      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
       drizzle-kit: 0.31.4
       drizzle-orm: 0.44.2(@electric-sql/pglite@0.3.4)(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(better-sqlite3@12.2.0)(pg@8.16.3)(sqlite3@5.1.7)
       pg: 8.16.3
@@ -9213,10 +9172,10 @@ snapshots:
       - typeorm
       - ws
 
-  '@elizaos/server@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)':
+  '@elizaos/server@1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)':
     dependencies:
-      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2)
-      '@elizaos/plugin-sql': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.2)
+      '@elizaos/core': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0)
+      '@elizaos/plugin-sql': 1.0.15(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(@libsql/client@0.14.0)(@opentelemetry/api@1.9.0)(@types/better-sqlite3@7.6.13)(@types/pg@8.15.4)(axios@1.10.0)(better-sqlite3@12.2.0)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(sqlite3@5.1.7)(ws@8.18.0)
       '@types/express': 5.0.3
       '@types/helmet': 4.0.0
       '@types/multer': 1.4.13
@@ -10308,14 +10267,14 @@ snapshots:
 
   '@kwsites/promise-deferred@1.1.1': {}
 
-  '@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67))':
+  '@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.20
-      langsmith: 0.3.34(openai@5.8.2(ws@8.18.2)(zod@3.25.67))
+      langsmith: 0.3.34(openai@5.8.2(ws@8.18.0)(zod@3.25.67))
       mustache: 4.2.0
       p-queue: 6.6.2
       p-retry: 4.6.2
@@ -10325,18 +10284,18 @@ snapshots:
     transitivePeerDependencies:
       - openai
 
-  '@langchain/openai@0.5.16(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(ws@8.18.2)':
+  '@langchain/openai@0.5.16(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(ws@8.18.0)':
     dependencies:
-      '@langchain/core': 0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67))
+      '@langchain/core': 0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67))
       js-tiktoken: 1.0.20
-      openai: 5.8.2(ws@8.18.2)(zod@3.25.67)
+      openai: 5.8.2(ws@8.18.0)(zod@3.25.67)
       zod: 3.25.67
     transitivePeerDependencies:
       - ws
 
-  '@langchain/textsplitters@0.1.0(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))':
+  '@langchain/textsplitters@0.1.0(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))':
     dependencies:
-      '@langchain/core': 0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67))
+      '@langchain/core': 0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67))
       js-tiktoken: 1.0.20
 
   '@libsql/client@0.14.0':
@@ -10489,8 +10448,6 @@ snapshots:
 
   '@next/swc-win32-x64-msvc@15.3.4':
     optional: true
-
-  '@noble/ciphers@1.3.0': {}
 
   '@noble/curves@1.2.0':
     dependencies:
@@ -11367,12 +11324,6 @@ snapshots:
       '@noble/hashes': 1.5.0
       '@scure/base': 1.1.9
 
-  '@scure/bip32@1.7.0':
-    dependencies:
-      '@noble/curves': 1.9.2
-      '@noble/hashes': 1.8.0
-      '@scure/base': 1.2.6
-
   '@scure/bip39@1.1.1':
     dependencies:
       '@noble/hashes': 1.2.0
@@ -11387,11 +11338,6 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.5.0
       '@scure/base': 1.1.9
-
-  '@scure/bip39@1.6.0':
-    dependencies:
-      '@noble/hashes': 1.8.0
-      '@scure/base': 1.2.6
 
   '@sec-ant/readable-stream@0.4.1': {}
 
@@ -11955,11 +11901,6 @@ snapshots:
       zod: 3.25.67
 
   abitype@1.0.6(typescript@5.8.3)(zod@3.25.67):
-    optionalDependencies:
-      typescript: 5.8.3
-      zod: 3.25.67
-
-  abitype@1.0.8(typescript@5.8.3)(zod@3.25.67):
     optionalDependencies:
       typescript: 5.8.3
       zod: 3.25.67
@@ -12736,7 +12677,7 @@ snapshots:
     dependencies:
       cipher-base: 1.0.6
       inherits: 2.0.4
-      ripemd160: 2.0.1
+      ripemd160: 2.0.2
       sha.js: 2.4.11
 
   create-hash@1.2.0:
@@ -13772,11 +13713,11 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.2):
+  graphql-ws@6.0.5(graphql@16.11.0)(ws@8.18.0):
     dependencies:
       graphql: 16.11.0
     optionalDependencies:
-      ws: 8.18.2
+      ws: 8.18.0
 
   graphql@16.11.0: {}
 
@@ -14136,10 +14077,6 @@ snapshots:
   isows@1.0.6(ws@8.18.0):
     dependencies:
       ws: 8.18.0
-
-  isows@1.0.7(ws@8.18.2):
-    dependencies:
-      ws: 8.18.2
 
   istanbul-lib-coverage@3.2.2: {}
 
@@ -14580,15 +14517,15 @@ snapshots:
 
   kleur@3.0.3: {}
 
-  langchain@0.3.29(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(axios@1.10.0)(handlebars@4.7.8)(openai@5.8.2(ws@8.18.2)(zod@3.25.67))(ws@8.18.2):
+  langchain@0.3.29(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(axios@1.10.0)(handlebars@4.7.8)(openai@5.8.2(ws@8.18.0)(zod@3.25.67))(ws@8.18.0):
     dependencies:
-      '@langchain/core': 0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67))
-      '@langchain/openai': 0.5.16(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))(ws@8.18.2)
-      '@langchain/textsplitters': 0.1.0(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.2)(zod@3.25.67)))
+      '@langchain/core': 0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67))
+      '@langchain/openai': 0.5.16(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))(ws@8.18.0)
+      '@langchain/textsplitters': 0.1.0(@langchain/core@0.3.61(openai@5.8.2(ws@8.18.0)(zod@3.25.67)))
       js-tiktoken: 1.0.20
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
-      langsmith: 0.3.34(openai@5.8.2(ws@8.18.2)(zod@3.25.67))
+      langsmith: 0.3.34(openai@5.8.2(ws@8.18.0)(zod@3.25.67))
       openapi-types: 12.1.3
       p-retry: 4.6.2
       uuid: 10.0.0
@@ -14601,7 +14538,7 @@ snapshots:
       - openai
       - ws
 
-  langsmith@0.3.34(openai@5.8.2(ws@8.18.2)(zod@3.25.67)):
+  langsmith@0.3.34(openai@5.8.2(ws@8.18.0)(zod@3.25.67)):
     dependencies:
       '@types/uuid': 10.0.0
       chalk: 4.1.2
@@ -14611,7 +14548,7 @@ snapshots:
       semver: 7.7.2
       uuid: 10.0.0
     optionalDependencies:
-      openai: 5.8.2(ws@8.18.2)(zod@3.25.67)
+      openai: 5.8.2(ws@8.18.0)(zod@3.25.67)
 
   leven@3.1.0: {}
 
@@ -15303,7 +15240,7 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.104.0(encoding@0.1.13)(ws@8.18.2)(zod@3.25.67):
+  openai@4.104.0(encoding@0.1.13)(ws@8.18.0)(zod@3.25.67):
     dependencies:
       '@types/node': 18.19.112
       '@types/node-fetch': 2.6.12
@@ -15313,14 +15250,14 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0(encoding@0.1.13)
     optionalDependencies:
-      ws: 8.18.2
+      ws: 8.18.0
       zod: 3.25.67
     transitivePeerDependencies:
       - encoding
 
-  openai@5.8.2(ws@8.18.2)(zod@3.25.67):
+  openai@5.8.2(ws@8.18.0)(zod@3.25.67):
     optionalDependencies:
-      ws: 8.18.2
+      ws: 8.18.0
       zod: 3.25.67
 
   openapi-types@12.1.3: {}
@@ -15351,21 +15288,6 @@ snapshots:
   os-tmpdir@1.0.2: {}
 
   outdent@0.5.0: {}
-
-  ox@0.8.1(typescript@5.8.3)(zod@3.25.67):
-    dependencies:
-      '@adraffy/ens-normalize': 1.11.0
-      '@noble/ciphers': 1.3.0
-      '@noble/curves': 1.9.2
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.0.8(typescript@5.8.3)(zod@3.25.67)
-      eventemitter3: 5.0.1
-    optionalDependencies:
-      typescript: 5.8.3
-    transitivePeerDependencies:
-      - zod
 
   p-filter@2.1.0:
     dependencies:
@@ -17014,23 +16936,6 @@ snapshots:
       - utf-8-validate
       - zod
 
-  viem@2.31.4(typescript@5.8.3)(zod@3.25.67):
-    dependencies:
-      '@noble/curves': 1.9.2
-      '@noble/hashes': 1.8.0
-      '@scure/bip32': 1.7.0
-      '@scure/bip39': 1.6.0
-      abitype: 1.0.8(typescript@5.8.3)(zod@3.25.67)
-      isows: 1.0.7(ws@8.18.2)
-      ox: 0.8.1(typescript@5.8.3)(zod@3.25.67)
-      ws: 8.18.2
-    optionalDependencies:
-      typescript: 5.8.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-      - zod
-
   vite-node@2.1.5(@types/node@20.19.1)(lightningcss@1.30.1):
     dependencies:
       cac: 6.7.14
@@ -17115,8 +17020,8 @@ snapshots:
 
   webauthn-p256@0.0.10:
     dependencies:
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
+      '@noble/curves': 1.9.2
+      '@noble/hashes': 1.8.0
 
   webidl-conversions@3.0.1: {}
 
