@@ -1,5 +1,4 @@
 {
-    "rootDirectory": "./",
     "buildCommand": "cd ccip-javascript-sdk && pnpm install && pnpm build && cd ../pitch-perfect-client && npm run build",
     "outputDirectory": "pitch-perfect-client/.next"
 }
