@@ -4,9 +4,31 @@
  */
 
 import { createClient, TransferStatus } from "@chainlink/ccip-js";
-import { createPublicClient, createWalletClient, http, custom, Address, Hash } from "viem";
-import { CCIPTransactionStatus, SupportedNetworks, CCIPTransactionRequest } from "../types";
+import {
+  createPublicClient,
+  createWalletClient,
+  http,
+  custom,
+  Address,
+  Hash,
+  PublicClient,
+  Client,
+} from "viem";
+import {
+  CCIPTransactionStatus,
+  SupportedNetworks,
+  CCIPTransactionRequest,
+} from "../types";
 import { networkConfigs } from "../config";
+import {
+  sepolia,
+  avalancheFuji,
+  baseSepolia,
+  arbitrumSepolia,
+  optimismSepolia,
+  polygonAmoy,
+  bscTestnet,
+} from "viem/chains";
 
 /**
  * Initialize CCIP Client using the real SDK
@@ -29,11 +51,10 @@ export async function transferTokens(params: {
   feeTokenAddress?: Address;
   data?: `0x${string}`;
 }): Promise<{ txHash: Hash; messageId: Hash }> {
-  
   console.log("[CCIP SDK] Executing real transfer tokens:", params);
-  
+
   const ccipClient = createCCIPClient();
-  
+
   try {
     const result = await ccipClient.transferTokens({
       client: params.walletClient,
@@ -45,17 +66,16 @@ export async function transferTokens(params: {
       feeTokenAddress: params.feeTokenAddress,
       data: params.data,
     });
-    
+
     console.log("[CCIP SDK] Transfer successful:", {
       txHash: result.txHash,
-      messageId: result.messageId
+      messageId: result.messageId,
     });
-    
+
     return {
       txHash: result.txHash,
-      messageId: result.messageId
+      messageId: result.messageId,
     };
-    
   } catch (error) {
     console.error("[CCIP SDK] Transfer failed:", error);
     throw error;
@@ -70,48 +90,62 @@ export async function getTransactionStatus(
   sourceNetwork: SupportedNetworks,
   destinationNetwork: SupportedNetworks
 ): Promise<CCIPTransactionStatus> {
-  console.log("[CCIP SDK] Getting real transaction status:", { messageId, sourceNetwork, destinationNetwork });
-  
+  console.log("[CCIP SDK] Getting real transaction status:", {
+    messageId,
+    sourceNetwork,
+    destinationNetwork,
+  });
+
   const ccipClient = createCCIPClient();
-  
+
   try {
     const destConfig = networkConfigs[destinationNetwork];
-    
-    // Create public client for destination chain
+
+    // Map network to viem chain
+    const chainMap: any = {
+      "Ethereum Sepolia Testnet": sepolia,
+      "Avalanche Fuji Testnet": avalancheFuji,
+      "Base Sepolia Testnet": baseSepolia,
+      "Arbitrum Sepolia Testnet": arbitrumSepolia,
+      "Optimism Sepolia Testnet": optimismSepolia,
+      "Polygon Amoy Testnet": polygonAmoy,
+      "BNB Chain Testnet": bscTestnet,
+    };
+    const viemChain = chainMap[destConfig.description];
     const publicClient = createPublicClient({
+      chain: viemChain,
       transport: http(destConfig.rpc),
     });
-    
+
     const sourceConfig = networkConfigs[sourceNetwork];
-    
+
     const result = await ccipClient.getTransferStatus({
-      client: publicClient,
+      client: publicClient as Client,
       destinationRouterAddress: destConfig.routerAddress as Address,
       sourceChainSelector: sourceConfig.chainSelector,
       messageId: messageId as Hash,
     });
-    
+
     // Convert SDK status to our format
     const status = convertTransferStatus(result);
-    
+
     return {
       messageId,
       status,
       sourceChain: sourceNetwork,
       destinationChain: destinationNetwork,
       timestamp: Date.now(),
-      explorerUrl: getCCIPExplorerUrl(messageId)
+      explorerUrl: getCCIPExplorerUrl(messageId),
     };
-    
   } catch (error) {
     console.error("[CCIP SDK] Status check failed:", error);
-    
+
     return {
       messageId,
-      status: 'UNKNOWN',
+      status: "UNKNOWN",
       sourceChain: sourceNetwork,
       destinationChain: destinationNetwork,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 }
@@ -127,23 +161,33 @@ export async function getFees(params: {
   destinationAccount: Address;
   feeTokenAddress?: Address;
 }): Promise<{ nativeFee: string; linkFee: string }> {
-  
   console.log("[CCIP SDK] Getting real fees:", params);
-  
+
   const ccipClient = createCCIPClient();
-  
+
   try {
     const sourceConfig = networkConfigs[params.sourceNetwork];
     const destConfig = networkConfigs[params.destinationNetwork];
-    
-    // Create public client for source chain
+
+    // Map network to viem chain
+    const chainMap: any = {
+      "Ethereum Sepolia Testnet": sepolia,
+      "Avalanche Fuji Testnet": avalancheFuji,
+      "Base Sepolia Testnet": baseSepolia,
+      "Arbitrum Sepolia Testnet": arbitrumSepolia,
+      "Optimism Sepolia Testnet": optimismSepolia,
+      "Polygon Amoy Testnet": polygonAmoy,
+      "BNB Chain Testnet": bscTestnet,
+    };
+    const viemChain = chainMap[sourceConfig.description];
     const publicClient = createPublicClient({
+      chain: viemChain,
       transport: http(sourceConfig.rpc),
     });
-    
+
     // Get fee in native token (no feeTokenAddress)
     const nativeFee = await ccipClient.getFee({
-      client: publicClient,
+      client: publicClient as Client,
       routerAddress: sourceConfig.routerAddress as Address,
       destinationAccount: params.destinationAccount,
       destinationChainSelector: destConfig.chainSelector,
@@ -151,10 +195,10 @@ export async function getFees(params: {
       tokenAddress: params.tokenAddress,
       // feeTokenAddress not specified = native token
     });
-    
+
     // Get fee in LINK token
     const linkFee = await ccipClient.getFee({
-      client: publicClient,
+      client: publicClient as Client,
       routerAddress: sourceConfig.routerAddress as Address,
       destinationAccount: params.destinationAccount,
       destinationChainSelector: destConfig.chainSelector,
@@ -162,19 +206,18 @@ export async function getFees(params: {
       tokenAddress: params.tokenAddress,
       feeTokenAddress: sourceConfig.linkTokenAddress as Address,
     });
-    
+
     return {
       nativeFee: formatAmount(nativeFee),
-      linkFee: formatAmount(linkFee)
+      linkFee: formatAmount(linkFee),
     };
-    
   } catch (error) {
     console.error("[CCIP SDK] Fee calculation failed:", error);
-    
+
     // Return fallback fees
     return {
       nativeFee: "0.005",
-      linkFee: "2.5"
+      linkFee: "2.5",
     };
   }
 }
@@ -188,11 +231,10 @@ export async function approveRouter(params: {
   tokenAddress: Address;
   amount: bigint;
 }): Promise<{ txHash: Hash }> {
-  
   console.log("[CCIP SDK] Approving router:", params);
-  
+
   const ccipClient = createCCIPClient();
-  
+
   try {
     const result = await ccipClient.approveRouter({
       client: params.walletClient,
@@ -201,13 +243,12 @@ export async function approveRouter(params: {
       amount: params.amount,
       waitForReceipt: true,
     });
-    
+
     console.log("[CCIP SDK] Router approval successful:", result.txHash);
-    
+
     return {
-      txHash: result.txHash
+      txHash: result.txHash,
     };
-    
   } catch (error) {
     console.error("[CCIP SDK] Router approval failed:", error);
     throw error;
@@ -223,30 +264,39 @@ export async function getAllowance(params: {
   tokenAddress: Address;
   account: Address;
 }): Promise<bigint> {
-  
   console.log("[CCIP SDK] Getting allowance:", params);
-  
+
   const ccipClient = createCCIPClient();
-  
+
   try {
     const sourceConfig = networkConfigs[params.sourceNetwork];
-    
-    // Create public client for source chain
+
+    // Map network to viem chain
+    const chainMap: any = {
+      "Ethereum Sepolia Testnet": sepolia,
+      "Avalanche Fuji Testnet": avalancheFuji,
+      "Base Sepolia Testnet": baseSepolia,
+      "Arbitrum Sepolia Testnet": arbitrumSepolia,
+      "Optimism Sepolia Testnet": optimismSepolia,
+      "Polygon Amoy Testnet": polygonAmoy,
+      "BNB Chain Testnet": bscTestnet,
+    };
+    const viemChain = chainMap[sourceConfig.description];
     const publicClient = createPublicClient({
+      chain: viemChain,
       transport: http(sourceConfig.rpc),
     });
-    
+
     const allowance = await ccipClient.getAllowance({
-      client: publicClient,
+      client: publicClient as Client,
       routerAddress: params.routerAddress,
       tokenAddress: params.tokenAddress,
       account: params.account,
     });
-    
+
     console.log("[CCIP SDK] Allowance:", allowance.toString());
-    
+
     return allowance;
-    
   } catch (error) {
     console.error("[CCIP SDK] Allowance check failed:", error);
     return 0n;
@@ -261,31 +311,40 @@ export async function isTokenSupported(params: {
   destinationNetwork: SupportedNetworks;
   tokenAddress: Address;
 }): Promise<boolean> {
-  
   console.log("[CCIP SDK] Checking token support:", params);
-  
+
   const ccipClient = createCCIPClient();
-  
+
   try {
     const sourceConfig = networkConfigs[params.sourceNetwork];
     const destConfig = networkConfigs[params.destinationNetwork];
-    
-    // Create public client for source chain
+
+    // Map network to viem chain
+    const chainMap: any = {
+      "Ethereum Sepolia Testnet": sepolia,
+      "Avalanche Fuji Testnet": avalancheFuji,
+      "Base Sepolia Testnet": baseSepolia,
+      "Arbitrum Sepolia Testnet": arbitrumSepolia,
+      "Optimism Sepolia Testnet": optimismSepolia,
+      "Polygon Amoy Testnet": polygonAmoy,
+      "BNB Chain Testnet": bscTestnet,
+    };
+    const viemChain = chainMap[sourceConfig.description];
     const publicClient = createPublicClient({
+      chain: viemChain,
       transport: http(sourceConfig.rpc),
     });
-    
+
     const isSupported = await ccipClient.isTokenSupported({
-      client: publicClient,
+      client: publicClient as Client,
       routerAddress: sourceConfig.routerAddress as Address,
       destinationChainSelector: destConfig.chainSelector,
       tokenAddress: params.tokenAddress,
     });
-    
+
     console.log("[CCIP SDK] Token supported:", isSupported);
-    
+
     return isSupported;
-    
   } catch (error) {
     console.error("[CCIP SDK] Token support check failed:", error);
     return false;
@@ -295,19 +354,25 @@ export async function isTokenSupported(params: {
 /**
  * Convert SDK TransferStatus to our format
  */
-function convertTransferStatus(status: TransferStatus | null): 'SUCCESS' | 'PENDING' | 'FAILED' | 'UNKNOWN' {
-  if (!status) return 'UNKNOWN';
-  
-  switch (status.state) {
-    case 'SUCCESS':
-      return 'SUCCESS';
-    case 'PENDING':
-      return 'PENDING';
-    case 'FAILURE':
-      return 'FAILED';
-    default:
-      return 'UNKNOWN';
+function convertTransferStatus(
+  status: TransferStatus | null
+): "SUCCESS" | "PENDING" | "FAILED" | "UNKNOWN" {
+  if (!status) return "UNKNOWN";
+
+  //@ts-ignore
+  if ("state" in status) {
+    switch (status.state) {
+      case "SUCCESS":
+        return "SUCCESS";
+      case "PENDING":
+        return "PENDING";
+      case "FAILURE":
+        return "FAILED";
+      default:
+        return "UNKNOWN";
+    }
   }
+  return "UNKNOWN";
 }
 
 /**
@@ -315,7 +380,9 @@ function convertTransferStatus(status: TransferStatus | null): 'SUCCESS' | 'PEND
  */
 export function formatMessageId(messageId: string): string {
   if (messageId.length <= 10) return messageId;
-  return `${messageId.substring(0, 6)}...${messageId.substring(messageId.length - 4)}`;
+  return `${messageId.substring(0, 6)}...${messageId.substring(
+    messageId.length - 4
+  )}`;
 }
 
 /**
@@ -336,10 +403,12 @@ export function isValidMessageId(messageId: string): boolean {
  * Convert amount to appropriate units
  */
 export function parseAmount(amount: string, decimals: number = 18): bigint {
-  const parts = amount.split('.');
-  const wholePart = parts[0] || '0';
-  const fracPart = (parts[1] || '').padEnd(decimals, '0').substring(0, decimals);
-  
+  const parts = amount.split(".");
+  const wholePart = parts[0] || "0";
+  const fracPart = (parts[1] || "")
+    .padEnd(decimals, "0")
+    .substring(0, decimals);
+
   return BigInt(wholePart + fracPart);
 }
 
@@ -347,22 +416,25 @@ export function parseAmount(amount: string, decimals: number = 18): bigint {
  * Format amount for display
  */
 export function formatAmount(amount: bigint, decimals: number = 18): string {
-  const amountStr = amount.toString().padStart(decimals + 1, '0');
-  const wholePart = amountStr.substring(0, amountStr.length - decimals) || '0';
+  const amountStr = amount.toString().padStart(decimals + 1, "0");
+  const wholePart = amountStr.substring(0, amountStr.length - decimals) || "0";
   const fracPart = amountStr.substring(amountStr.length - decimals);
-  
+
   // Remove trailing zeros from fractional part
-  const trimmedFracPart = fracPart.replace(/0+$/, '');
-  
+  const trimmedFracPart = fracPart.replace(/0+$/, "");
+
   return trimmedFracPart ? `${wholePart}.${trimmedFracPart}` : wholePart;
 }
 
 /**
  * Create wallet client for transaction execution
  */
-export function createWalletClientForChain(network: SupportedNetworks, provider: any) {
+export function createWalletClientForChain(
+  network: SupportedNetworks,
+  provider: any
+) {
   const config = networkConfigs[network];
-  
+
   return createWalletClient({
     transport: custom(provider),
   });
@@ -373,8 +445,9 @@ export function createWalletClientForChain(network: SupportedNetworks, provider:
  */
 export function createPublicClientForChain(network: SupportedNetworks) {
   const config = networkConfigs[network];
-  
+  // You may need to map config.description to a viem chain if needed
   return createPublicClient({
+    // chain: ...,
     transport: http(config.rpc),
   });
 }

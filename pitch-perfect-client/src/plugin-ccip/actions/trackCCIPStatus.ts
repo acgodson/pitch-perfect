@@ -4,11 +4,10 @@ import {
   Memory,
   State,
   HandlerCallback,
-  ActionExample,
   ModelType,
 } from "@elizaos/core";
 import { CCIPTransactionStatus, SupportedNetworks } from "../types";
-import { getTransactionStatus, isValidMessageId, formatMessageId } from "../utils/ccipSdk";
+import { getTransactionStatus, isValidMessageId } from "../utils/ccipSdk";
 
 /**
  * Track CCIP Status Action
@@ -173,17 +172,17 @@ async function getCCIPTransactionStatus(messageId: string): Promise<CCIPTransact
     
     return status;
   } catch (error) {
-    console.error("[TRACK_CCIP_STATUS] Real status check failed, using fallback:", error);
+    console.error("[TRACK_CCIP_STATUS] Real status check failed:", error);
     
     // Fallback to basic status
-    return {
-      messageId,
-      status: 'UNKNOWN',
-      sourceChain: "avalancheFuji",
-      destinationChain: "ethereumSepolia",
-      timestamp: Date.now(),
-      explorerUrl: `https://ccip.chain.link/msg/${messageId}`
-    };
+    // return {
+    //   messageId,
+    //   status: 'UNKNOWN',
+    //   sourceChain: "avalancheFuji",
+    //   destinationChain: "ethereumSepolia",
+    //   timestamp: Date.now(),
+    //   explorerUrl: `https://ccip.chain.link/msg/${messageId}`
+    // };
   }
 }
 
@@ -197,26 +196,6 @@ async function getRecentTransactions(runtime: IAgentRuntime, message: Memory): P
   if (!userId) {
     return [];
   }
-  
-  // Mock recent transactions
-  return [
-    {
-      messageId: "0x25d18c6adfc1f99514b40f9931a14ca08228cdbabfc5226c1e6a43ce7441595d",
-      status: "SUCCESS",
-      sourceChain: "ethereumSepolia",
-      destinationChain: "avalancheFuji",
-      timestamp: Date.now() - 300000, // 5 minutes ago
-      explorerUrl: "https://ccip.chain.link/msg/0x25d18c6adfc1f99514b40f9931a14ca08228cdbabfc5226c1e6a43ce7441595d"
-    },
-    {
-      messageId: "0x15b28c8adfc1f99514b40f9931a14ca08228cdbabfc5226c1e6a43ce7441595a",
-      status: "PENDING",
-      sourceChain: "baseSepolia", 
-      destinationChain: "polygonAmoy",
-      timestamp: Date.now() - 120000, // 2 minutes ago
-      explorerUrl: "https://ccip.chain.link/msg/0x15b28c8adfc1f99514b40f9931a14ca08228cdbabfc5226c1e6a43ce7441595a"
-    }
-  ];
 }
 
 /**

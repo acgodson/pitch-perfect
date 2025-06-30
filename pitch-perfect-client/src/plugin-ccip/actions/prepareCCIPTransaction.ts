@@ -251,22 +251,24 @@ async function prepareTransactionPreview(
     
   } catch (error) {
     console.error("[PREPARE_CCIP_TRANSACTION] Fee estimation failed:", error);
+
+    // TODO: throw actual error and not fallback
     
-    // Fallback to mock estimation
-    const estimatedFees = estimateTransactionFees(tx);
+    // // Fallback to mock estimation
+    // const estimatedFees = estimateTransactionFees(tx);
     
-    return {
-      from: context.userWalletAddress || "User Wallet",
-      to: tx.recipient,
-      amount: tx.amount,
-      token: getTokenSymbol(tx.token),
-      destinationNetwork: destConfig.description,
-      estimatedFees: estimatedFees.amount,
-      feeToken: estimatedFees.token,
-      chainSelector: destConfig.chainSelector,
-      routerAddress: destConfig.routerAddress,
-      requiresApproval: true
-    };
+    // return {
+    //   from: context.userWalletAddress || "User Wallet",
+    //   to: tx.recipient,
+    //   amount: tx.amount,
+    //   token: getTokenSymbol(tx.token),
+    //   destinationNetwork: destConfig.description,
+    //   estimatedFees: estimatedFees.amount,
+    //   feeToken: estimatedFees.token,
+    //   chainSelector: destConfig.chainSelector,
+    //   routerAddress: destConfig.routerAddress,
+    //   requiresApproval: true
+    // };
   }
 }
 
