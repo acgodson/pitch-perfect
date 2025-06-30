@@ -28,7 +28,8 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ]
+      ],
+      "@chainlink/ccip-js": ["../ccip-javascript-sdk/packages/ccip-js"]
     },
     "baseUrl": "."
   },
@@ -42,5 +43,8 @@
     "node_modules",
     "elizaos/**/*",
     "eliza-nextjs-starter/**/*"
+  ],
+  "references": [
+    { "path": "../ccip-javascript-sdk/packages/ccip-js" }
   ]
 }
