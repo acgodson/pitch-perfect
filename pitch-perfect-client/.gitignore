@@ -40,8 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-
-/tests
-/recorded_audio
+# Custom exclusions for this project
+/.eliza/
+/.voice-data/
+/tests/
+/recorded_audio/
 chainlink-ccip-docs.txt
 eliza_docs.txt
