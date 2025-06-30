@@ -1,0 +1,86 @@
+{
+  "name": "pitch-perfect-client",
+  "version": "1.0.9",
+  "type": "module",
+  "private": true,
+  "main": "dist/agent.js",
+  "module": "dist/agent.js",
+  "types": "dist/agent.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/agent.d.ts",
+        "default": "./dist/agent.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@covalenthq/ai-agent-sdk": "^0.3.0",
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
+    "@elizaos/cli": "^1.0.9",
+    "@elizaos/core": "^1.0.9",
+    "@elizaos/plugin-anthropic": "^1.0.3",
+    "@elizaos/plugin-bootstrap": "1.0.15",
+    "@elizaos/plugin-local-ai": "1.0.5",
+    "@elizaos/plugin-openai": "^1.0.4",
+    "@elizaos/plugin-sql": "^1.0.9",
+    "@hapi/shot": "^6.0.1",
+    "@libsql/client": "^0.14.0",
+    "@radix-ui/react-accordion": "^1.2.0",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@trpc/client": "11.0.0-rc.532",
+    "@trpc/react-query": "11.0.0-rc.532",
+    "@trpc/server": "11.0.0-rc.532",
+    "@types/pg": "^8.15.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "concurrently": "^9.1.2",
+    "evt": "^2.5.9",
+    "framer-motion": "^12.19.2",
+    "lucide-react": "^0.525.0",
+    "nanoid": "^5.0.7",
+    "next": "15.3.4",
+    "openai": "^5.8.2",
+    "pg": "^8.16.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "socket.io-client": "^4.8.1",
+    "sonner": "^1.7.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "2.1.5",
+    "postcss": "^8",
+    "prettier": "3.5.3",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss": "^4",
+    "tailwindcss-animate": "^1.0.7",
+    "tsup": "8.4.0",
+    "typescript": "^5",
+    "vitest": "2.1.5"
+  },
+  "scripts": {
+    "start": "next start -p 4000",
+    "dev": "next dev -p 4000",
+    "dev:with-agent": "tsup && concurrently \"elizaos dev\" \"next dev -p 4000\"",
+    "build": "tsup && next build",
+    "build:next-only": "next build",
+    "lint": "prettier --write ./src",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "format": "prettier --write ./src",
+    "format:check": "prettier --check ./src"
+  }
+}

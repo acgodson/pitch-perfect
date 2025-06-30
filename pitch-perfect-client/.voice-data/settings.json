@@ -1,0 +1,6 @@
+{
+  "identificationThreshold": 0.82,
+  "consistencyThreshold": 0.7,
+  "requiredPhrases": 5,
+  "apiUrl": "http://localhost:8000"
+}
