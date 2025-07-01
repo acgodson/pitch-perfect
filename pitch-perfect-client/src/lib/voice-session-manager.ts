@@ -24,6 +24,15 @@ export interface VoiceSession {
   agentId: string;
   sessionType: "voice";
   metadata?: any;
+  // Voice identification state
+  identificationState?: {
+    isUnlocked: boolean;
+    identifiedUser?: string;
+    identifiedUserId?: string;
+    confidence?: number;
+    unlockTimestamp?: number;
+    browserSessionId?: string;
+  };
 }
 
 export interface VoiceSessionData {
@@ -48,6 +57,7 @@ export class VoiceSessionManager {
   private activeSessionId: string | null = null;
   private entityId: string;
   private serverId: string;
+  private currentSession: VoiceSession | null = null;
 
   private constructor() {
     this.socketManager = SocketIOManager.getInstance();
@@ -226,6 +236,76 @@ export class VoiceSessionManager {
    */
   getSocketManager(): SocketIOManager {
     return this.socketManager;
+  }
+
+  /**
+   * Update voice identification state when user is identified
+   */
+  updateIdentificationState(identificationData: {
+    identifiedUser: string;
+    identifiedUserId: string;
+    confidence: number;
+    browserSessionId?: string;
+  }): void {
+    if (this.currentSession) {
+      this.currentSession.identificationState = {
+        isUnlocked: true,
+        identifiedUser: identificationData.identifiedUser,
+        identifiedUserId: identificationData.identifiedUserId,
+        confidence: identificationData.confidence,
+        unlockTimestamp: Date.now(),
+        browserSessionId: identificationData.browserSessionId,
+      };
+      console.log(`[VoiceSessionManager] Voice session unlocked for user: ${identificationData.identifiedUser}`);
+    }
+  }
+
+  /**
+   * Check if current session is unlocked (identified)
+   */
+  isSessionUnlocked(): boolean {
+    return this.currentSession?.identificationState?.isUnlocked || false;
+  }
+
+  /**
+   * Get the identified user from current session
+   */
+  getIdentifiedUser(): { userName: string; userId: string; confidence: number } | null {
+    const state = this.currentSession?.identificationState;
+    if (state?.isUnlocked && state.identifiedUser && state.identifiedUserId) {
+      return {
+        userName: state.identifiedUser,
+        userId: state.identifiedUserId,
+        confidence: state.confidence || 0,
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Clear identification state (when session ends or user logs out)
+   */
+  clearIdentificationState(): void {
+    if (this.currentSession) {
+      this.currentSession.identificationState = {
+        isUnlocked: false,
+      };
+      console.log("[VoiceSessionManager] Voice identification state cleared");
+    }
+  }
+
+  /**
+   * Get current session
+   */
+  getCurrentSession(): VoiceSession | null {
+    return this.currentSession;
+  }
+
+  /**
+   * Set current session
+   */
+  setCurrentSession(session: VoiceSession): void {
+    this.currentSession = session;
   }
 }
 

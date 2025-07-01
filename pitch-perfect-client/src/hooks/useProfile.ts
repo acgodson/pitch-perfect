@@ -6,6 +6,7 @@ import {
 import SocketIOManager from "@/lib/socketio-manager";
 import { VoiceSyncManager } from "../lib/voice-sync-manager";
 import { VoiceProfile } from "../lib/voice-api-client";
+import { voiceSessionState } from "@/lib/voice-session-state";
 
 interface ProfileData {
   name: string;
@@ -34,6 +35,15 @@ interface UseProfileReturn {
   isSessionLoading: boolean;
   sessionError: string | null;
 
+  // Voice identification state
+  identificationState: {
+    isUnlocked: boolean;
+    identifiedUser: string | null;
+    identifiedUserId: string | null;
+    confidence: number | null;
+    showSuccessUI: boolean;
+  };
+
   // Latest response from ElizaOS
   latestResponse: string | null;
   isProcessing: boolean;
@@ -45,7 +55,7 @@ interface UseProfileReturn {
   handleNextPhrase: () => void;
   handleCompleteRegistration: (
     profileData: ProfileData,
-    onComplete?: (userId: string) => void,
+    onComplete?: (userId: string, isAutoUnlocked: boolean) => void,
   ) => Promise<void>;
 
   // Voice session methods
@@ -55,6 +65,14 @@ interface UseProfileReturn {
   // Response handling
   clearResponse: () => void;
   setLatestResponse: (response: string | null) => void;
+
+  // Voice identification methods
+  clearIdentificationState: () => void;
+  isVoiceSessionUnlocked: () => boolean;
+  
+  // Navigation helpers
+  shouldNavigateToMainActivity: boolean;
+  resetNavigationFlag: () => void;
 }
 
 const REQUIRED_PHRASES = 2;
@@ -86,17 +104,62 @@ export const useProfile = (): UseProfileReturn => {
   const [latestResponse, setLatestResponse] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Voice identification state
+  const [identificationState, setIdentificationState] = useState({
+    isUnlocked: false,
+    identifiedUser: null as string | null,
+    identifiedUserId: null as string | null,
+    confidence: null as number | null,
+    showSuccessUI: false,
+  });
+  
+  // Navigation state
+  const [shouldNavigateToMainActivity, setShouldNavigateToMainActivity] = useState(false);
+
   // Store mediaRecorder reference
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   // Add ref to track current channel ID to avoid race conditions
   const currentChannelIdRef = useRef<string | null>(null);
+  
+  // Store completion callback for registration
+  const registrationCompletionCallbackRef = useRef<((userId: string, isAutoUnlocked: boolean) => void) | null>(null);
 
   const socketIOManager = SocketIOManager.getInstance();
 
   // Store original profile data for registration
   const [originalProfileData, setOriginalProfileData] = useState<ProfileData | null>(null);
+
+  // Initialize identification state from session state on mount
+  useEffect(() => {
+    const sessionState = voiceSessionState.getSessionState();
+    if (sessionState?.isUnlocked) {
+      setIdentificationState({
+        isUnlocked: true,
+        identifiedUser: sessionState.identifiedUser || null,
+        identifiedUserId: sessionState.identifiedUserId || null,
+        confidence: sessionState.confidence || null,
+        showSuccessUI: false, // Don't show UI on page load
+      });
+      
+      // Also sync with voice session manager
+      if (sessionState.identifiedUser && sessionState.identifiedUserId) {
+        voiceSessionManager.updateIdentificationState({
+          identifiedUser: sessionState.identifiedUser,
+          identifiedUserId: sessionState.identifiedUserId,
+          confidence: sessionState.confidence || 0,
+          browserSessionId: sessionState.browserSessionId,
+        });
+      }
+      
+      console.log("🔄 Restored voice identification state from localStorage:", {
+        user: sessionState.identifiedUser,
+        expiresAt: sessionState.expirationTime ? new Date(sessionState.expirationTime).toISOString() : 'never',
+        isValid: !sessionState.expirationTime || Date.now() < sessionState.expirationTime
+      });
+    }
+  }, []);
 
   // Set up persistent registration response listener
   useEffect(() => {
@@ -110,6 +173,8 @@ export const useProfile = (): UseProfileReturn => {
     if (currentSession?.channelId) {
       currentChannelIdRef.current = currentSession.channelId;
       console.log("🔧 Updated currentChannelIdRef to:", currentChannelIdRef.current);
+    } else {
+      console.log("🔧 currentSession has no channelId:", currentSession);
     }
 
     // Test listener to see ALL messageBroadcast events
@@ -125,19 +190,11 @@ export const useProfile = (): UseProfileReturn => {
 
     const handleRegistrationResponse = async (data: any) => {
       let extractedVoiceProfile: any = null;
-      console.log("📨 Received message from ElizaOS:", {
-        senderName: data.senderName,
-        text: data.text,
-        thought: data.thought,
-        channelId: data.channelId,
-        roomId: data.roomId,
-        source: data.source,
-        metadata: data.metadata,
-      });
+      console.log("📨 Received message from ElizaOS:", data);
 
       // Listen for messages from the agent in our active session channel
-      // Use roomId for broadcast messages, fallback to channelId
       const messageChannelId = data.roomId || data.channelId;
+      
       console.log("🔍 Channel comparison:", {
         messageChannelId,
         sessionChannelId: currentSession?.channelId,
@@ -148,22 +205,32 @@ export const useProfile = (): UseProfileReturn => {
         isFromSelf: data.senderId === socketIOManager.getEntityId(),
       });
 
-      if (
-        (messageChannelId === currentChannelIdRef.current || messageChannelId === currentSession?.channelId) &&
-        data.senderId !== socketIOManager.getEntityId()
-      ) {
+      const responseMessage = data.thought || data.text;
+      
+      // Check if this message is for our channel and from the agent (not from ourselves)
+      const isOurChannel = messageChannelId === currentChannelIdRef.current || 
+                          messageChannelId === currentSession?.channelId;
+
+      const isFromAgent = data.senderId !== socketIOManager.getEntityId();
+      
+      // Also allow voice registration responses even if channel doesn't match initially
+      // This handles cases where the session state isn't fully updated yet
+      const isVoiceRegistrationResponse = isFromAgent && responseMessage && 
+        (responseMessage.includes("🎉 Voice registration successful") ||
+         responseMessage.includes("Successfully registered voice") ||
+         responseMessage.includes("Consistency Score"));
+      
+      if ((isOurChannel && isFromAgent) || isVoiceRegistrationResponse) {
         console.log("🤖 Received registration response from agent:", data);
 
-        // Use thought field if available, otherwise fall back to text
-        const responseMessage = data.thought || data.text;
-
-        // BETTER APPROACH: Fetch the complete profile from server after registration
+        // Fetch the complete profile from server after registration
         if (
           responseMessage &&
           (responseMessage.includes("🎉 Voice registration successful") ||
             responseMessage.includes("Successfully registered voice") ||
             responseMessage.includes("Consistency Score"))
         ) {
+          console.log("🎉 Detected successful registration response, callback exists:", !!registrationCompletionCallbackRef.current);
           console.log(
             "✅ Voice registration successful, fetching complete profile from server...",
           );
@@ -172,10 +239,13 @@ export const useProfile = (): UseProfileReturn => {
           try {
             // Determine the correct URL based on environment
             const baseUrl = typeof window === "undefined" 
-              ? "http://localhost:4000"  // Node.js/ElizaOS agent environment
-              : "";                      // Browser environment (relative URLs work)
+              ? "http://localhost:4000"  
+              : "";                    
             
-            const response = await fetch(`${baseUrl}/api/eliza/voice-registry/profiles`);
+            const voiceSyncManager = VoiceSyncManager.getInstance();
+            const browserSessionId = voiceSyncManager.getBrowserSessionId();
+
+            const response = await fetch(`${baseUrl}/api/eliza/voice-registry/profiles/session?sessionId=${browserSessionId}`);
             if (response.ok) {
               const data = await response.json();
               if (data.success && data.data?.profiles?.length > 0) {
@@ -222,22 +292,38 @@ export const useProfile = (): UseProfileReturn => {
           return { ...prev, agentResponse: responseMessage };
         });
 
-        // Check for registration success/failure
-        if (data.metadata?.registrationSuccess !== undefined) {
-          if (data.metadata.registrationSuccess) {
-            console.log("✅ Voice registration successful:", data.metadata);
+        // Parse embedded JSON metadata from text since ElizaOS doesn't forward custom metadata
+        const parseEmbeddedMetadata = (text: string) => {
+          // Look for JSON object in the text
+          const jsonMatch = text.match(/\{[^{}]*(?:"[^"]*"[^{}]*)*\}/);
+          if (jsonMatch) {
+            try {
+              return JSON.parse(jsonMatch[0]);
+            } catch (error) {
+              console.error("Failed to parse embedded JSON metadata:", error);
+              return {};
+            }
+          }
+          return {};
+        };
+
+        const attachmentMetadata = data.attachment || parseEmbeddedMetadata(responseMessage) || {};
+        console.log("🔍 Retrieved metadata from attachment/text:", attachmentMetadata);
+
+        // Check for registration success/failure using attachment metadata
+        if (attachmentMetadata.registrationSuccess !== undefined) {
+          if (attachmentMetadata.registrationSuccess) {
+            console.log("✅ Voice registration successful from attachment:", attachmentMetadata);
             setRegistrationState((prev) => ({
               ...prev,
               isLoading: false,
               error: null,
             }));
           } else {
-            console.error("❌ Voice registration failed:", data.metadata);
+            console.error("❌ Voice registration failed from attachment:", attachmentMetadata);
             setRegistrationState((prev) => ({
               ...prev,
-              error:
-                data.metadata.error ||
-                "Voice registration failed. Please try again.",
+              error: "Voice registration failed. Please try again.",
               isLoading: false,
             }));
           }
@@ -299,7 +385,7 @@ export const useProfile = (): UseProfileReturn => {
               finalUserId: userId,
             });
 
-            // IMPORTANT: Use extracted voice profile from server fetch (most reliable)
+            // IMPORTANT: Use extracted voice profile from server fetch
             const agentVoiceProfile = extractedVoiceProfile || data.metadata?.voiceProfile;
 
             let voiceProfile: VoiceProfile;
@@ -307,7 +393,10 @@ export const useProfile = (): UseProfileReturn => {
             if (
               agentVoiceProfile &&
               agentVoiceProfile.voiceEmbedding &&
-              agentVoiceProfile.phraseEmbeddings
+              agentVoiceProfile.phraseEmbeddings &&
+              agentVoiceProfile.voiceEmbedding.length > 0 &&
+              agentVoiceProfile.phraseEmbeddings.length > 0 &&
+              agentVoiceProfile.phraseEmbeddings.every((emb: any) => emb.length > 0)
             ) {
               // Use the complete profile from server (with embeddings)
               voiceProfile = {
@@ -329,70 +418,45 @@ export const useProfile = (): UseProfileReturn => {
               console.log(
                 "🎯 Using complete voice profile from server (with embeddings)",
               );
+
+              // Add to localStorage
+              voiceSyncManager.addVoiceProfile(voiceProfile);
+
+              console.log("✅ Voice profile saved with valid embeddings - ready for identification!", {
+                userId: voiceProfile.userId,
+                userName: voiceProfile.userName,
+                consistencyScore: voiceProfile.consistencyScore,
+                hasEmbeddings: voiceProfile.voiceEmbedding.length > 0,
+                embeddingCount: voiceProfile.phraseEmbeddings.length,
+                voiceEmbeddingDimension: voiceProfile.voiceEmbedding.length,
+                phraseEmbeddingDimensions: voiceProfile.phraseEmbeddings.map(
+                  (emb) => emb.length,
+                ),
+                browserSessionId: voiceProfile.browserSessionId,
+              });
+
+              // Trigger sync to server (this will ensure embeddings are available for identification)
+              voiceSyncManager.syncToServer().then((success) => {
+                if (success) {
+                  console.log("🔄 Voice profile synced to server successfully");
+                } else {
+                  console.warn(
+                    "⚠️ Voice profile sync to server failed - identification may not work",
+                  );
+                }
+              });
             } else {
-              // Fallback: Create profile without embeddings (will be populated by server sync)
-              voiceProfile = {
-                userId: userId,
-                userName: userName,
-                voiceEmbedding: [], // Will be populated by server sync
-                phraseEmbeddings: [], // Will be populated by server sync
-                phrases: [
-                  "The quick brown fox jumps over the lazy dog",
-                  "Hello world, this is a test phrase",
-                ],
-                consistencyScore: consistencyScore,
-                minConsistency: 0.7,
-                enrollmentTimestamp: Date.now(),
-                browserSessionId: voiceSyncManager.getBrowserSessionId(),
-              };
-              console.log(
-                "⚠️ Using fallback profile (no embeddings from server)",
+              // No fallback: log error and set registration error state
+              console.error(
+                "❌ No valid voice profile with embeddings received from server. Registration failed."
               );
+              setRegistrationState((prev) => ({
+                ...prev,
+                error: "Voice registration failed: could not retrieve valid profile with embeddings from server. Please try again.",
+                isLoading: false,
+              }));
+              return;
             }
-
-            // Add to localStorage
-            voiceSyncManager.addVoiceProfile(voiceProfile);
-
-            // Verify the profile has valid embeddings for identification
-            const hasValidEmbeddings =
-              voiceProfile.voiceEmbedding.length > 0 &&
-              voiceProfile.phraseEmbeddings.length > 0 &&
-              voiceProfile.phraseEmbeddings.every((emb) => emb.length > 0);
-
-            console.log("💾 Voice profile saved to localStorage:", {
-              userId: voiceProfile.userId,
-              userName: voiceProfile.userName,
-              consistencyScore: voiceProfile.consistencyScore,
-              hasEmbeddings: voiceProfile.voiceEmbedding.length > 0,
-              embeddingCount: voiceProfile.phraseEmbeddings.length,
-              hasValidEmbeddings: hasValidEmbeddings,
-              voiceEmbeddingDimension: voiceProfile.voiceEmbedding.length,
-              phraseEmbeddingDimensions: voiceProfile.phraseEmbeddings.map(
-                (emb) => emb.length,
-              ),
-              browserSessionId: voiceProfile.browserSessionId,
-            });
-
-            if (!hasValidEmbeddings) {
-              console.warn(
-                "⚠️ Voice profile saved but missing embeddings - voice identification may not work!",
-              );
-            } else {
-              console.log(
-                "✅ Voice profile saved with valid embeddings - ready for identification!",
-              );
-            }
-
-            // Trigger sync to server (this will ensure embeddings are available for identification)
-            voiceSyncManager.syncToServer().then((success) => {
-              if (success) {
-                console.log("🔄 Voice profile synced to server successfully");
-              } else {
-                console.warn(
-                  "⚠️ Voice profile sync to server failed - identification may not work",
-                );
-              }
-            });
           } catch (localStorageError) {
             console.error(
               "❌ Error saving voice profile to localStorage:",
@@ -400,7 +464,7 @@ export const useProfile = (): UseProfileReturn => {
             );
           }
 
-          // CRITICAL: Update UI state to show success and stop loading
+          // Update UI state to show success and stop loading
           setRegistrationState((prev) => ({
             ...prev,
             isLoading: false,
@@ -408,28 +472,149 @@ export const useProfile = (): UseProfileReturn => {
             agentResponse: responseMessage,
           }));
 
-          // Check for voice identification success/failure
-          if (data.metadata?.identificationSuccess !== undefined) {
-            if (data.metadata.identificationSuccess) {
-              console.log("✅ Voice identification successful:", data.metadata);
-              setRegistrationState((prev) => ({
-                ...prev,
-                isLoading: false,
-                error: null,
-              }));
+          // For registration responses that don't include identificationSuccess metadata,
+          // check for registration success pattern and trigger callback with auto-unlock
+          if (!attachmentMetadata.identificationSuccess && 
+              attachmentMetadata.registrationSuccess && 
+              registrationCompletionCallbackRef.current) {
+            console.log("🎉 Registration completed - auto-unlocking session");
+            
+            // Since this is a successful registration, automatically unlock the session
+            const userId = attachmentMetadata.userId || extractedVoiceProfile?.userId || "unknown";
+            const userName = originalProfileData?.name || extractedVoiceProfile?.userName || attachmentMetadata.identifiedUser || "Unknown User";
+            const confidence = attachmentMetadata.confidence || extractedVoiceProfile?.consistencyScore || 0.9;
+            
+            // Set identification state for auto-unlock
+            setIdentificationState({
+              isUnlocked: true,
+              identifiedUser: userName,
+              identifiedUserId: userId,
+              confidence: confidence,
+              showSuccessUI: false, // Don't show success UI for registration
+            });
+
+            // Save to session state for persistence
+            voiceSessionState.updateWithIdentification({
+              identifiedUser: userName,
+              identifiedUserId: userId,
+              confidence: confidence,
+              browserSessionId: attachmentMetadata.browserSessionId || extractedVoiceProfile?.browserSessionId,
+            });
+
+            // Update the voice session manager
+            voiceSessionManager.updateIdentificationState({
+              identifiedUser: userName,
+              identifiedUserId: userId,
+              confidence: confidence,
+              browserSessionId: attachmentMetadata.browserSessionId || extractedVoiceProfile?.browserSessionId,
+            });
+
+            // Update current session
+            if (currentSession) {
+              const updatedSession = { ...currentSession };
+              updatedSession.identificationState = {
+                isUnlocked: true,
+                identifiedUser: userName,
+                identifiedUserId: userId,
+                confidence: confidence,
+                unlockTimestamp: Date.now(),
+                browserSessionId: attachmentMetadata.browserSessionId || extractedVoiceProfile?.browserSessionId,
+              };
+              setCurrentSession(updatedSession);
+              voiceSessionManager.setCurrentSession(updatedSession);
+            }
+
+            // Set navigation flag
+            setShouldNavigateToMainActivity(true);
+            
+            registrationCompletionCallbackRef.current(userId, true); // true = auto-unlocked
+            registrationCompletionCallbackRef.current = null;
+          }
+
+          console.log("🔍 Checking metadata for identification or registration flags:", {
+            hasIdentificationSuccess: attachmentMetadata.identificationSuccess !== undefined,
+            hasRegistrationSuccess: attachmentMetadata.registrationSuccess !== undefined,
+            isFromRegistration: attachmentMetadata.isFromRegistration,
+            registrationCompletionCallbackExists: !!registrationCompletionCallbackRef.current,
+          });
+
+          // Check for voice identification success/failure (can happen during registration)
+          if (attachmentMetadata.identificationSuccess !== undefined) {
+            if (attachmentMetadata.identificationSuccess) {
+              console.log("✅ Voice identification successful:", attachmentMetadata);
               
-              // Update the current session with the identified user
-              if (data.metadata.identifiedUser && data.metadata.userId) {
-                console.log("🎯 User identified:", data.metadata.identifiedUser);
-                // You could update the session or trigger a callback here
+              // Update the identification state (works for both registration and identification)
+              setIdentificationState({
+                isUnlocked: true,
+                identifiedUser: attachmentMetadata.identifiedUser,
+                identifiedUserId: attachmentMetadata.userId,
+                confidence: attachmentMetadata.confidence,
+                showSuccessUI: !attachmentMetadata.isFromRegistration, // Don't show success UI for registration, handle differently
+              });
+
+              // Save to session state for persistence
+              voiceSessionState.updateWithIdentification({
+                identifiedUser: attachmentMetadata.identifiedUser,
+                identifiedUserId: attachmentMetadata.userId,
+                confidence: attachmentMetadata.confidence,
+                browserSessionId: attachmentMetadata.browserSessionId,
+              });
+
+              // Update the voice session manager
+              voiceSessionManager.updateIdentificationState({
+                identifiedUser: attachmentMetadata.identifiedUser,
+                identifiedUserId: attachmentMetadata.userId,
+                confidence: attachmentMetadata.confidence,
+                browserSessionId: attachmentMetadata.browserSessionId,
+              });
+
+              // Update current session
+              if (currentSession) {
+                const updatedSession = { ...currentSession };
+                updatedSession.identificationState = {
+                  isUnlocked: true,
+                  identifiedUser: attachmentMetadata.identifiedUser,
+                  identifiedUserId: attachmentMetadata.userId,
+                  confidence: attachmentMetadata.confidence,
+                  unlockTimestamp: Date.now(),
+                  browserSessionId: attachmentMetadata.browserSessionId,
+                };
+                setCurrentSession(updatedSession);
+                voiceSessionManager.setCurrentSession(updatedSession);
+              }
+
+              console.log("🎯 User identified:", attachmentMetadata.identifiedUser);
+              
+              // If this is from registration, trigger completion callback
+              if (attachmentMetadata.isFromRegistration) {
+                console.log("🎉 Registration completed with automatic session unlock");
+                
+                // Set navigation flag for main activity
+                setShouldNavigateToMainActivity(true);
+                
+                // Trigger completion callback if available
+                if (registrationCompletionCallbackRef.current) {
+                  registrationCompletionCallbackRef.current(attachmentMetadata.userId, true);
+                  registrationCompletionCallbackRef.current = null; // Clear after use
+                }
               }
             } else {
-              console.error("❌ Voice identification failed:", data.metadata);
-              setRegistrationState((prev) => ({
-                ...prev,
-                error: data.metadata.error || "Voice identification failed. Please try again.",
-                isLoading: false,
-              }));
+              console.error("❌ Voice identification failed:", attachmentMetadata);
+              setIdentificationState({
+                isUnlocked: false,
+                identifiedUser: null,
+                identifiedUserId: null,
+                confidence: null,
+                showSuccessUI: false,
+              });
+              
+              if (!attachmentMetadata.isFromRegistration) {
+                setRegistrationState((prev) => ({
+                  ...prev,
+                  error: "Voice identification failed. Please try again.",
+                  isLoading: false,
+                }));
+              }
             }
           }
 
@@ -462,6 +647,14 @@ export const useProfile = (): UseProfileReturn => {
       timestamp: new Date().toISOString(),
     });
   }, [currentSession]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      // Clear any pending callbacks
+      registrationCompletionCallbackRef.current = null;
+    };
+  }, []);
 
   // Voice recording methods
   const startRecording = useCallback(async () => {
@@ -555,7 +748,7 @@ export const useProfile = (): UseProfileReturn => {
   }, []);
 
   const handleCompleteRegistration = useCallback(
-    async (profileData: ProfileData, onComplete?: (userId: string) => void) => {
+    async (profileData: ProfileData, onComplete?: (userId: string, isAutoUnlocked: boolean) => void) => {
       // Guard against insufficient recordings
       if (
         !registrationState.recordings ||
@@ -574,6 +767,9 @@ export const useProfile = (): UseProfileReturn => {
 
       // Store original profile data for later use
       setOriginalProfileData(profileData);
+      
+      // Store completion callback for later use
+      registrationCompletionCallbackRef.current = onComplete || null;
 
       setRegistrationState((prev) => ({
         ...prev,
@@ -853,13 +1049,64 @@ export const useProfile = (): UseProfileReturn => {
               if (data.metadata.identificationSuccess) {
                 console.log("✅ Voice identification successful:", data.metadata);
                 
-                // Update the current session with the identified user
-                if (data.metadata.identifiedUser && data.metadata.userId) {
-                  console.log("🎯 User identified:", data.metadata.identifiedUser);
-                  // You could update the session or trigger a callback here
+                // Update the identification state
+                setIdentificationState({
+                  isUnlocked: true,
+                  identifiedUser: data.metadata.identifiedUser,
+                  identifiedUserId: data.metadata.userId,
+                  confidence: data.metadata.confidence,
+                  showSuccessUI: true,
+                });
+
+                // Update the voice session manager
+                voiceSessionManager.updateIdentificationState({
+                  identifiedUser: data.metadata.identifiedUser,
+                  identifiedUserId: data.metadata.userId,
+                  confidence: data.metadata.confidence,
+                  browserSessionId: data.metadata.browserSessionId,
+                });
+
+                // Save to session state for persistence
+                voiceSessionState.updateWithIdentification({
+                  identifiedUser: data.metadata.identifiedUser,
+                  identifiedUserId: data.metadata.userId,
+                  confidence: data.metadata.confidence,
+                  browserSessionId: data.metadata.browserSessionId,
+                });
+
+                // Update current session
+                if (currentSession) {
+                  const updatedSession = { ...currentSession };
+                  updatedSession.identificationState = {
+                    isUnlocked: true,
+                    identifiedUser: data.metadata.identifiedUser,
+                    identifiedUserId: data.metadata.userId,
+                    confidence: data.metadata.confidence,
+                    unlockTimestamp: Date.now(),
+                    browserSessionId: data.metadata.browserSessionId,
+                  };
+                  setCurrentSession(updatedSession);
+                  voiceSessionManager.setCurrentSession(updatedSession);
                 }
+
+                console.log("🎯 User identified:", data.metadata.identifiedUser);
+                
+                // Auto-hide success UI after 3 seconds
+                setTimeout(() => {
+                  setIdentificationState(prev => ({
+                    ...prev,
+                    showSuccessUI: false,
+                  }));
+                }, 3000);
               } else {
                 console.error("❌ Voice identification failed:", data.metadata);
+                setIdentificationState({
+                  isUnlocked: false,
+                  identifiedUser: null,
+                  identifiedUserId: null,
+                  confidence: null,
+                  showSuccessUI: false,
+                });
                 setLatestResponse(
                   data.metadata.error || "Voice identification failed. Please try again."
                 );
@@ -892,13 +1139,36 @@ export const useProfile = (): UseProfileReturn => {
     setLatestResponse(null);
   }, []);
 
+  // Voice identification methods
+  const clearIdentificationState = useCallback(() => {
+    setIdentificationState({
+      isUnlocked: false,
+      identifiedUser: null,
+      identifiedUserId: null,
+      confidence: null,
+      showSuccessUI: false,
+    });
+    voiceSessionManager.clearIdentificationState();
+    voiceSessionState.clearSessionState();
+  }, []);
+
+  const isVoiceSessionUnlocked = useCallback(() => {
+    return identificationState.isUnlocked || voiceSessionManager.isSessionUnlocked();
+  }, [identificationState.isUnlocked]);
+
+  const resetNavigationFlag = useCallback(() => {
+    setShouldNavigateToMainActivity(false);
+  }, []);
+
   return {
     registrationState,
     currentSession,
     isSessionLoading,
     sessionError,
+    identificationState,
     latestResponse,
     isProcessing,
+    shouldNavigateToMainActivity,
     startRecording,
     stopRecording,
     resetRecording,
@@ -908,5 +1178,8 @@ export const useProfile = (): UseProfileReturn => {
     sendVoiceMessage,
     clearResponse,
     setLatestResponse,
+    clearIdentificationState,
+    isVoiceSessionUnlocked,
+    resetNavigationFlag,
   };
 };

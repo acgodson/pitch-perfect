@@ -6,6 +6,8 @@ export default defineConfig({
   tsconfig: './tsconfig.build.json', // Use build-specific tsconfig
   sourcemap: true,
   clean: true,
+  bundle: true, // Bundle all dependencies into the output file
+  splitting: false, // Prevent code splitting to ensure a single output file
   format: ['esm'], // Use ESM to match package.json type: module
   dts: false, // Skip DTS generation to avoid external import issues
   external: [

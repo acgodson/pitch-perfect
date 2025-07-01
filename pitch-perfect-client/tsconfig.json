@@ -45,6 +45,6 @@
     "eliza-nextjs-starter/**/*"
   ],
   "references": [
-    { "path": "../ccip-javascript-sdk/packages/ccip-js" }
+    { "path": "../ccip-javascript-sdk/packages/ccip-js", "composite": true }
   ]
 }

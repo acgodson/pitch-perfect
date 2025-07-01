@@ -36,27 +36,18 @@ export async function GET(
 
     switch (action) {
       case "profiles":
-        // Return profile summaries for ElizaOS provider
         const allProfiles = await dbService.getAllVoiceProfiles();
-        const profileSummaries = allProfiles.map((profile) => ({
-          userId: profile.userId,
-          userName: profile.userName,
-          consistencyScore: profile.consistencyScore,
-          enrollmentTimestamp: profile.enrollmentTimestamp,
-          phrasesCount: profile.phrases.length,
-        }));
 
         return NextResponse.json({
           success: true,
           data: {
-            profiles: profileSummaries,
+            profiles: allProfiles,
             totalProfiles: allProfiles.length,
             lastSync: Date.now(),
           },
         });
 
       case "profiles/session":
-        // Return profile summaries filtered by browser session
         const { searchParams } = new URL(request.url);
         const browserSessionId = searchParams.get("sessionId");
         
@@ -68,18 +59,11 @@ export async function GET(
         }
 
         const sessionProfiles = await dbService.getVoiceProfilesBySession(browserSessionId);
-        const sessionProfileSummaries = sessionProfiles.map((profile) => ({
-          userId: profile.userId,
-          userName: profile.userName,
-          consistencyScore: profile.consistencyScore,
-          enrollmentTimestamp: profile.enrollmentTimestamp,
-          phrasesCount: profile.phrases.length,
-        }));
 
         return NextResponse.json({
           success: true,
           data: {
-            profiles: sessionProfileSummaries,
+            profiles: sessionProfiles,
             totalProfiles: sessionProfiles.length,
             lastSync: Date.now(),
             browserSessionId: browserSessionId,

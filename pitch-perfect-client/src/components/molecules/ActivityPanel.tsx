@@ -72,11 +72,13 @@ export const ActivityPanel = ({
     currentSession,
     isSessionLoading,
     sessionError,
+    identificationState,
     latestResponse,
     isProcessing,
     createVoiceSession,
     sendVoiceMessage,
     clearResponse,
+    isVoiceSessionUnlocked,
   } = useProfile();
 
   // Track if we've already created a session for this profile match
@@ -180,9 +182,17 @@ export const ActivityPanel = ({
                   <h2 className="text-xl font-semibold text-white">
                     {selectedProfile.name}'s Dashboard
                   </h2>
-                  <p className="text-emerald-400 text-sm">
-                    Voice matched profile
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-emerald-400 text-sm">
+                      Voice matched profile
+                    </p>
+                    {isVoiceSessionUnlocked() && (
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span className="text-emerald-300 text-xs">Session Active</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <Avatar className="w-12 h-12">
@@ -229,16 +239,30 @@ export const ActivityPanel = ({
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center space-y-4"
                 >
-                  <div className="w-16 h-16 mx-auto bg-emerald-400/20 rounded-full flex items-center justify-center">
-                    <Mic size={32} className="text-emerald-400" />
+                  <div className="relative">
+                    <div className="w-16 h-16 mx-auto bg-emerald-400/20 rounded-full flex items-center justify-center">
+                      <Mic size={32} className="text-emerald-400" />
+                    </div>
+                    {identificationState.isUnlocked && (
+                      <div className="absolute -top-1 -right-4 w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs animate-pulse">
+                        ✓
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h3 className="text-lg font-medium text-white">
-                      Welcome back, {selectedProfile.name}!
+                      Welcome back, {identificationState.identifiedUser || selectedProfile.name}!
                     </h3>
-                    <p className="text-blue-200 text-sm">
-                      Your voice has been recognized
-                    </p>
+                    <div className="space-y-1">
+                      <p className="text-blue-200 text-sm">
+                        {identificationState.isUnlocked ? "Voice session active" : "Your voice has been recognized"}
+                      </p>
+                      {identificationState.confidence && (
+                        <p className="text-emerald-300 text-xs">
+                          Confidence: {(identificationState.confidence * 100).toFixed(1)}%
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
 

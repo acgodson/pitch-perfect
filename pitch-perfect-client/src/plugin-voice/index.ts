@@ -379,14 +379,10 @@ function sanitizeMetadataForPrompt(metadata: any): any {
  * Provides voice recognition, embedding extraction, voice registry management, and conversation context
  */
 const voicePlugin: Plugin = {
-  name: "pitch-perfect-voice",
-  description:
-    "Voice recognition, transcription, and conversation context capabilities for Pitch Perfect - Ethereum wallet voice controller",
-
+  name: "voice-plugin",
+  description: "A voice plugin for handling voice interactions in ElizaOS.",
   providers: [voiceEmbeddingProvider, conversationContextProvider],
-
   actions: voiceActions,
-
   events: {
     [EventType.MESSAGE_RECEIVED]: [
       async (payload: MessagePayload) => {

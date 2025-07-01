@@ -18,7 +18,7 @@ export interface VoiceSettings {
 export class VoiceDatabaseService {
   private static instance: VoiceDatabaseService | null = null;
   private isInitialized = false;
-  private dataDir = "./.voice-data";
+  private dataDir = path.resolve(process.cwd(), ".voice-data");
   private profilesFile = path.join(this.dataDir, "profiles.json");
   private settingsFile = path.join(this.dataDir, "settings.json");
 
@@ -276,11 +276,14 @@ export class VoiceDatabaseService {
   }
 
   /**
-   * Close the database connection
+   * Closes the database connection.
+   * Resets the initialization state without destroying the singleton instance.
    */
   public async close(): Promise<void> {
-    this.isInitialized = false;
-    console.log("[VoiceDatabaseService] Database connection closed");
+    if (this.isInitialized) {
+      console.log("[VoiceDatabaseService] Resetting database service state.");
+      this.isInitialized = false;
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 import type { IAgentRuntime, Memory, Provider, State } from "@elizaos/core";
 import { addHeader, logger } from "@elizaos/core";
+import { VoiceEmbeddingService } from "./embedding";
 
 /**
  * Conversation Context Provider for Voice Plugin
@@ -14,6 +15,20 @@ export const conversationContextProvider: Provider = {
     logger.debug("*** RETRIEVING CONVERSATION CONTEXT ***");
 
     try {
+      // Get user profile to check for a linked wallet
+      const voiceService = new VoiceEmbeddingService(runtime);
+      const userId = (message.metadata as any)?.userId;
+      let walletAddress = "Not linked";
+      if (userId) {
+        const memories = await runtime.getMemories({ tableName: "profiles" });
+        const profileMemory = memories.find(
+          (m) => (m.content as any)?.userId === userId
+        );
+        if (profileMemory && (profileMemory.content as any)?.walletAddress) {
+          walletAddress = (profileMemory.content as any).walletAddress;
+        }
+      }
+
       // Get recent messages from the same room (session)
       const recentMessages = await runtime.getMemories({
         tableName: "messages",
@@ -31,6 +46,7 @@ export const conversationContextProvider: Provider = {
             recentMessagesCount: 0,
             hasContext: false,
             sessionId: message.roomId, // Use roomId as sessionId
+            walletAddress,
           },
           text: "",
         };
@@ -64,7 +80,7 @@ export const conversationContextProvider: Provider = {
 
       const conversationText = addHeader(
         "# Recent Conversation Context",
-        `Session: ${sessionMetadata}\n\n${conversationSummary}\n\n${contextAnalysis}`,
+        `Session: ${sessionMetadata}\nUser Wallet: ${walletAddress}\n\n${conversationSummary}\n\n${contextAnalysis}`,
       );
 
       logger.debug("*** CONVERSATION CONTEXT RETRIEVED ***", {
@@ -72,6 +88,7 @@ export const conversationContextProvider: Provider = {
         hasContext: conversationMessages.length > 0,
         roomId: message.roomId,
         sessionId: sessionMetadata,
+        walletAddress,
       });
 
       return {
@@ -80,6 +97,7 @@ export const conversationContextProvider: Provider = {
           conversationContext: conversationSummary,
           contextAnalysis,
           sessionId: sessionMetadata,
+          walletAddress,
         },
         values: {
           conversationContext: conversationText,
@@ -88,6 +106,7 @@ export const conversationContextProvider: Provider = {
           conversationSummary,
           contextAnalysis,
           sessionId: sessionMetadata,
+          walletAddress,
         },
         text: conversationText,
       };

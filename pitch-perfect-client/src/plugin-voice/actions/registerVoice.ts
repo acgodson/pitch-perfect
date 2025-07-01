@@ -291,16 +291,30 @@ async function processVoiceRegistration(
       );
     }
 
+    // Save session state since registration automatically unlocks the session
+    const { voiceSessionState } = await import("../../lib/voice-session-state");
+    voiceSessionState.updateWithIdentification({
+      identifiedUser: userName,
+      identifiedUserId: voiceProfile.userId,
+      confidence: consistencyScore, // Use consistency score as confidence
+      browserSessionId: registrationData.browserSessionId,
+    });
+
     const responseContent: Content = {
-      thought: `Successfully registered voice for ${userName}. Consistency score: ${consistencyScore.toFixed(3)}. Voice profile created with ${embeddings.length} phrases.`,
-      text: `🎉 Voice registration successful for ${userName}!\n\nConsistency Score: ${(consistencyScore * 100).toFixed(1)}%\nPhrases Recorded: ${embeddings.length}\n\nYou can now use "Hey Beca, listen up" to activate voice commands!\n\nProfile ID: ${voiceProfile.userId}\nProfile synced to server with embeddings.`,
+      thought: `Successfully registered voice for ${userName}. Consistency score: ${consistencyScore.toFixed(3)}. Voice profile created with ${embeddings.length} phrases. Session automatically unlocked.`,
+      text: `🎉 Voice registration successful for ${userName}!\n\nConsistency Score: ${(consistencyScore * 100).toFixed(1)}%\nPhrases Recorded: ${embeddings.length}\n\nYour profile is now unlocked and ready for voice commands!\n\nProfile ID: ${voiceProfile.userId} {"registrationSuccess":true,"identificationSuccess":true,"identifiedUser":"${userName}","userId":"${voiceProfile.userId}","confidence":${consistencyScore},"browserSessionId":"${registrationData.browserSessionId || 'none'}","isFromRegistration":true,"autoUnlocked":true}`,
       actions: ["REGISTER_VOICE"],
       metadata: {
         registrationSuccess: true,
-        userName: userName,
+        // Add identification metadata for automatic session unlock
+        identificationSuccess: true,
+        identifiedUser: userName,
+        userId: voiceProfile.userId,
+        confidence: consistencyScore,
+        browserSessionId: registrationData.browserSessionId,
+        // Registration-specific metadata
         consistencyScore: consistencyScore,
         phrasesCount: embeddings.length,
-        userId: voiceProfile.userId,
         voiceProfile: {
           userId: voiceProfile.userId,
           userName: voiceProfile.userName,
@@ -310,7 +324,10 @@ async function processVoiceRegistration(
           consistencyScore: voiceProfile.consistencyScore,
           minConsistency: voiceProfile.minConsistency,
           enrollmentTimestamp: voiceProfile.enrollmentTimestamp,
+          browserSessionId: voiceProfile.browserSessionId,
         },
+        // Flag to indicate this is from registration (for different UI handling)
+        isFromRegistration: true,
       },
     };
 

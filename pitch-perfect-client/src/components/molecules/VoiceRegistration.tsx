@@ -20,7 +20,7 @@ interface VoiceRegistrationProps {
     emoji: string;
     isAdult: boolean;
   };
-  onComplete: (userId: string) => void;
+  onComplete: (userId: string, isAutoUnlocked?: boolean) => void;
   onBack: () => void;
 }
 
@@ -184,11 +184,11 @@ export const VoiceRegistration = ({
     setStatusMessage("Sending voice data to agent...");
 
     try {
-      await handleCompleteRegistration(profileData, (userId) => {
+      await handleCompleteRegistration(profileData, (userId, isAutoUnlocked) => {
         setRegistrationStatus("success");
         setStatusMessage("Registration successful!");
-        addDebugLog(`Registration completed successfully! User ID: ${userId}`);
-        onComplete(userId);
+        addDebugLog(`Registration completed successfully! User ID: ${userId}, Auto-unlocked: ${isAutoUnlocked}`);
+        onComplete(userId, isAutoUnlocked);
       });
     } catch (error) {
       addDebugLog(`Registration failed: ${error}`);

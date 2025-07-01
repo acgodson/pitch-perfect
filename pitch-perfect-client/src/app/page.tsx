@@ -74,12 +74,16 @@ export default function LandingPage() {
     currentSession,
     isSessionLoading,
     sessionError,
+    identificationState,
     latestResponse,
     isProcessing: isVoiceProcessing,
+    shouldNavigateToMainActivity,
     createVoiceSession,
     sendVoiceMessage,
     clearResponse,
     setLatestResponse,
+    isVoiceSessionUnlocked,
+    resetNavigationFlag,
   } = useProfile();
 
   // Load profiles from localStorage on page load
@@ -192,28 +196,83 @@ export default function LandingPage() {
   };
 
   // Handle profile creation completion
-  const handleProfileCreationComplete = async (userId?: string) => {
-    console.log("✅ Profile creation completed, adding new profile...");
+  const handleProfileCreationComplete = async (userId?: string, isAutoUnlocked?: boolean) => {
+    console.log("✅ Profile creation completed, adding new profile...", { userId, isAutoUnlocked });
     setIsCreatingProfile(false);
 
     if (userId) {
       await addProfileAfterRegistration(userId);
+      
+      // If registration automatically unlocked the session, navigate to main activity
+      if (isAutoUnlocked) {
+        console.log("🔓 Session auto-unlocked after registration, showing main activity");
+        setShowProfileActivity(true);
+      }
     }
   };
 
   const handleVoiceCommand = async (audioBlob: Blob) => {
     console.log("🎤 Voice command received, size:", audioBlob.size, "bytes");
+    console.log("🔍 Current session state:", {
+      isUnlocked: identificationState.isUnlocked,
+      identifiedUser: identificationState.identifiedUser,
+      selectedProfile: selectedProfile?.name,
+      isProfileMatched: isProfileMatched,
+    });
 
-    // Reset profile match state when user speaks again
-    if (isProfileMatched) {
-      console.log("🔄 Resetting profile match state for new voice command");
-      setIsProfileMatched(false);
-      setIsProcessing(false);
-      return;
+    // Check if we have an active voice session (user is already identified)
+    if (identificationState.isUnlocked || isVoiceSessionUnlocked()) {
+      console.log("🔓 Session is unlocked - transcribing voice to text for conversation");
+      setIsProcessing(true);
+
+      try {
+        // Transcribe the audio to text using OpenAI/voice API
+        console.log("🎤 Transcribing audio for conversation...");
+        const transcript = await transcribeAudio(audioBlob);
+        console.log("📝 Transcribed text:", transcript);
+
+        // Send transcribed text to agent as a regular conversation message
+        if (currentSession) {
+          console.log("💬 Sending transcribed text to agent:", transcript);
+          
+          // Import SocketIOManager dynamically
+          const SocketIOManager = (await import("../lib/socketio-manager")).default;
+          const socketIOManager = SocketIOManager.getInstance();
+
+          await socketIOManager.sendChannelMessage(
+            transcript, // Send the transcribed text
+            currentSession.channelId,
+            "text_chat", // Mark as text chat, not voice
+            currentSession.channelId,
+            undefined,
+            [],
+            {
+              source: "voice_transcription",
+              sessionId: currentSession.id,
+              transcript: transcript,
+              identifiedUser: identificationState.identifiedUser,
+              identifiedUserId: identificationState.identifiedUserId,
+              browserSessionId: (await import("../lib/voice-sync-manager")).VoiceSyncManager.getInstance().getBrowserSessionId(),
+              timestamp: Date.now(),
+            },
+          );
+
+          console.log("✅ Transcribed message sent to agent");
+        } else {
+          console.error("❌ No active session for conversation");
+        }
+
+        setIsProcessing(false);
+        return;
+      } catch (error) {
+        console.error("❌ Error transcribing voice for conversation:", error);
+        setIsProcessing(false);
+        return;
+      }
     }
 
-    // If no profile is selected, this is the voice gateway
-    if (!selectedProfile) {
+    // If no session is unlocked, check if this is a voice identification attempt
+    if (!selectedProfile && !identificationState.isUnlocked) {
       console.log("🔍 No profile selected - initiating voice identification");
       setIsProcessing(true);
 
@@ -343,50 +402,54 @@ export default function LandingPage() {
               setLatestResponse(responseMessage);
               setIsProcessing(false);
 
-              // Check for voice identification success/failure
-              if (responseMessage.includes("🎉 Welcome back") || responseMessage.includes("Voice identification successful")) {
-                console.log("✅ Voice identification successful, updating UI...");
+              // Check for voice identification success/failure using structured metadata
+              if (data.metadata?.identificationSuccess !== undefined) {
+                if (data.metadata.identificationSuccess) {
+                  console.log("✅ Voice identification successful from metadata:", data.metadata);
+                  
+                  // The useProfile hook will handle the session state updates
+                  // We just need to handle the UI navigation here
+                  setSelectedProfile({
+                    id: data.metadata.userId || "unknown",
+                    name: data.metadata.identifiedUser || "Unknown User",
+                    role: "User",
+                    isActive: true,
+                  });
+                  setIsProfileMatched(true);
+                  setIsProcessing(false);
 
-                // Extract user info from the response
-                const userNameMatch = responseMessage.match(/Welcome back, ([^!]+)!/);
-                const userName = userNameMatch ? userNameMatch[1] : "Unknown User";
+                  // Navigate to activity panel immediately
+                  console.log("🎯 Navigating to activity panel for:", data.metadata.identifiedUser);
+                  setShowProfileActivity(true);
+                } else {
+                  console.log("❌ Voice identification failed from metadata:", data.metadata);
+                  setIsProcessing(false);
+                }
+              } else {
+                // Fallback to string matching for legacy responses
+                if (responseMessage.includes("🎉 Welcome back") || responseMessage.includes("Voice identification successful")) {
+                  console.log("✅ Voice identification successful (legacy response), updating UI...");
 
-                // Find the profile in localStorage
-                const loadProfileFromLocalStorage = async () => {
-                  try {
-                    const { VoiceSyncManager } = await import("../lib/voice-sync-manager");
-                    const voiceSyncManager = VoiceSyncManager.getInstance();
-                    const voiceRegistry = voiceSyncManager.getVoiceRegistryFromStorage();
-                    const identifiedProfile = voiceRegistry.profiles.find(p => p.userName === userName);
+                  // Extract user info from the response
+                  const userNameMatch = responseMessage.match(/Welcome back, ([^!]+)!/);
+                  const userName = userNameMatch ? userNameMatch[1] : "Unknown User";
 
-                    if (identifiedProfile) {
-                      console.log("🎯 Setting identified profile:", identifiedProfile);
-                      setSelectedProfile({
-                        id: identifiedProfile.userId,
-                        name: identifiedProfile.userName,
-                        role: "User",
-                        isActive: true,
-                      });
-                      setIsProfileMatched(true);
-                      setIsProcessing(false);
-
-                      // Show activity board after a short delay
-                      setTimeout(() => {
-                        console.log("🎯 Opening activity board for:", identifiedProfile.userName);
-                      }, 2000);
-                    } else {
-                      console.warn("⚠️ Identified profile not found in localStorage:", userName);
-                    }
-                  } catch (error) {
-                    console.error("❌ Error loading identified profile:", error);
-                  }
-                };
-
-                loadProfileFromLocalStorage();
-              } else if (responseMessage.includes("❌ Voice identification failed")) {
-                console.log("❌ Voice identification failed");
-                setIsProcessing(false);
-                // Could show an error message to the user
+                  setSelectedProfile({
+                    id: "legacy_user",
+                    name: userName,
+                    role: "User",
+                    isActive: true,
+                  });
+                  setIsProfileMatched(true);
+                  setIsProcessing(false);
+                  
+                  // Navigate to activity panel
+                  console.log("🎯 Navigating to activity panel for:", userName);
+                  setShowProfileActivity(true);
+                } else if (responseMessage.includes("❌ Voice identification failed")) {
+                  console.log("❌ Voice identification failed");
+                  setIsProcessing(false);
+                }
               }
 
               // Clean up the listener after processing
@@ -440,6 +503,31 @@ export default function LandingPage() {
     setIsProcessing(isVoiceProcessing);
   }, [isVoiceProcessing]);
 
+  // Handle navigation after successful registration
+  useEffect(() => {
+    if (shouldNavigateToMainActivity) {
+      console.log("🚀 Navigation flag set, showing main activity");
+      setShowProfileActivity(true);
+      resetNavigationFlag();
+    }
+  }, [shouldNavigateToMainActivity, resetNavigationFlag]);
+
+  // Initialize session state on page load
+  useEffect(() => {
+    if (identificationState.isUnlocked && identificationState.identifiedUser) {
+      console.log("🔄 Session already unlocked for:", identificationState.identifiedUser);
+      // Set profile as selected and matched
+      setSelectedProfile({
+        id: identificationState.identifiedUserId || "unknown",
+        name: identificationState.identifiedUser,
+        role: "Voice User",
+        isActive: true,
+      });
+      setIsProfileMatched(true);
+      setShowProfileActivity(true);
+    }
+  }, [identificationState]);
+
   // Log agent responses
   useEffect(() => {
     if (latestResponse) {
@@ -467,9 +555,38 @@ export default function LandingPage() {
                 onCommand={handleVoiceCommand}
                 className="mx-auto"
                 isProcessing={isProcessing}
-                isProfileMatched={isProfileMatched}
+                isProfileMatched={isProfileMatched || identificationState.isUnlocked}
+                showSuccessIndicator={identificationState.showSuccessUI}
+                identifiedUser={identificationState.identifiedUser}
+                onNavigateToActivity={() => {
+                  console.log("🎯 Green tick clicked, navigating to main activity");
+                  setShowProfileActivity(true);
+                }}
               />
             </div>
+
+            {/* Success Message Overlay */}
+            {identificationState.showSuccessUI && identificationState.identifiedUser && (
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="bg-emerald-500/90 backdrop-blur-md text-white px-6 py-4 rounded-2xl shadow-2xl border border-emerald-400/30">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <span className="text-lg">✅</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold">Welcome back!</p>
+                      <p className="text-sm text-emerald-100">{identificationState.identifiedUser}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
 
             <motion.div

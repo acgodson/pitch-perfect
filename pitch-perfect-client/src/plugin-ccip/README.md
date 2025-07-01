@@ -42,31 +42,6 @@ plugin-ccip/
 
 ## Installation
 
-### 1. CCIP SDK Setup
-```bash
-# Clone the CCIP JavaScript SDK repository
-git clone https://github.com/smartcontractkit/ccip-javascript-sdk.git
-
-# Install and build the SDK
-cd ccip-javascript-sdk
-pnpm install
-pnpm build
-```
-
-### 2. Dependencies
-```bash
-npm install @chainlink/contracts-ccip ethers viem
-```
-
-### 3. Workspace Reference
-Update your package.json to use the local CCIP SDK:
-```json
-{
-  "dependencies": {
-    "@chainlink/ccip-js": "link:../../ccip-javascript-sdk/packages/ccip-js"
-  }
-}
-```
 
 ### 2. Plugin Registration
 ```typescript
@@ -117,7 +92,6 @@ export const networkConfigs = {
 ```
 
 ### Contract Addresses
-After deploying PitchPerfectSender contracts, update:
 ```typescript
 // config.ts
 export const pitchPerfectSenderAddresses = {
@@ -217,22 +191,13 @@ console.log("Message ID:", result.messageId);
 - **Token support validation** ✨
 - **Router approval functionality** ✨
 
-### 🚧 TODO
+
 - Frontend wallet integration for transaction execution
 - Transaction history persistence in database
 - Enhanced error handling and retry logic
 - Multi-signature wallet support
 - Advanced routing strategies
 
-## Testing
-
-### Real CCIP SDK Functions
-All core functions now use the real CCIP SDK:
-- ✅ Real transaction status checking with message IDs
-- ✅ Real fee estimation for all supported networks
-- ✅ Real token support validation
-- ✅ Real allowance checking
-- ✅ Router approval functionality
 
 ### Voice Integration Test
 ```bash

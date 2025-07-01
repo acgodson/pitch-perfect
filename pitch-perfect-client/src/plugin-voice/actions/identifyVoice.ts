@@ -54,18 +54,48 @@ export const identifyVoice: Action = {
       metadata?.raw?.source === "voice_recording" ||
       metadata?.raw?.metadata?.source === "voice_recording";
     
+    // NEW: Check if this is a voice transcription (from unlocked session)
+    const isVoiceTranscription = 
+      metadata?.source === "voice_transcription" ||
+      metadata?.raw?.source === "voice_transcription" ||
+      metadata?.raw?.metadata?.source === "voice_transcription";
+    
     // Check for startup phrases in the message
     const hasStartupPhrase = 
       text.includes("beca") ||
       text.includes("listen up") ||
       text.includes("listening up");
     
+    // IMPORTANT: Skip identification for voice transcriptions (unlocked sessions)
+    if (isVoiceTranscription) {
+      console.log("[Voice Identification] Skipping validation - this is a voice transcription for conversation, not identification");
+      return false;
+    }
+    
+    // Import voice session state manager to check if session is already unlocked
+    let isSessionUnlocked = false;
+    try {
+      const { voiceSessionState } = await import("../../lib/voice-session-state");
+      isSessionUnlocked = voiceSessionState.isSessionUnlocked();
+    } catch (error) {
+      console.log("[Voice Identification] Could not check session state:", error);
+    }
+    
+    // If session is unlocked and this is a voice message (not explicit identification command),
+    // skip identification - it should be handled as conversation
+    if (isSessionUnlocked && !hasIdentificationCommand && isVoiceMessage) {
+      console.log("[Voice Identification] Skipping validation - session is unlocked and this appears to be a conversation voice message");
+      return false;
+    }
+    
     console.log("[Voice Identification] Validation check:", {
       text,
       hasIdentificationCommand,
       hasAudioData,
       isVoiceMessage,
+      isVoiceTranscription,
       hasStartupPhrase,
+      isSessionUnlocked,
       shouldValidate: hasIdentificationCommand || (hasAudioData && (isVoiceMessage || hasStartupPhrase))
     });
     
@@ -91,6 +121,53 @@ export const identifyVoice: Action = {
         messageText: message.content.text,
         audioDataPath: audioData ? "found" : "not found",
       });
+
+      // Check if this is a transaction confirmation request (always allow identification for security)
+      const messageText = message.content.text?.toLowerCase() || "";
+      const isTransactionConfirmation = 
+        messageText.includes("confirm") ||
+        messageText.includes("transaction") ||
+        messageText.includes("transfer") ||
+        messageText.includes("send") ||
+        messageText.includes("approve");
+
+      // Import voice session state manager
+      const { voiceSessionState } = await import("../../lib/voice-session-state");
+      
+      // Check if session is already unlocked (skip redundant identification unless it's a transaction)
+      if (!isTransactionConfirmation && voiceSessionState.isSessionUnlocked()) {
+        const identifiedUser = voiceSessionState.getIdentifiedUser();
+        if (identifiedUser) {
+          console.log("[Voice Identification] Session already unlocked, skipping identification for:", identifiedUser.userName);
+          
+          const responseContent: Content = {
+            thought: `Session already unlocked for ${identifiedUser.userName}`,
+            text: `✅ You're already identified as ${identifiedUser.userName}.\n\nSession is active and ready for voice commands. {"identificationSuccess":true,"identifiedUser":"${identifiedUser.userName}","userId":"${identifiedUser.userId}","confidence":${identifiedUser.confidence},"browserSessionId":"${browserSessionId || 'none'}","sessionAlreadyActive":true}`,
+            actions: ["IDENTIFY_VOICE"],
+            metadata: {
+              identificationSuccess: true,
+              identifiedUser: identifiedUser.userName,
+              userId: identifiedUser.userId,
+              confidence: identifiedUser.confidence,
+              browserSessionId: browserSessionId,
+              sessionAlreadyActive: true,
+            },
+          };
+
+          if (callback) {
+            await callback(responseContent);
+          }
+
+          return { 
+            success: true, 
+            identified: true,
+            user: identifiedUser,
+            confidence: identifiedUser.confidence,
+            browserSessionId: browserSessionId,
+            sessionAlreadyActive: true,
+          };
+        }
+      }
 
       if (!audioData) {
         const responseContent: Content = {
@@ -144,9 +221,18 @@ export const identifyVoice: Action = {
         });
 
         if (identificationResult.identified && identificationResult.match) {
+          // Save the session state for future use
+          const { voiceSessionState } = await import("../../lib/voice-session-state");
+          voiceSessionState.updateWithIdentification({
+            identifiedUser: identificationResult.match.userName,
+            identifiedUserId: identificationResult.match.userId,
+            confidence: identificationResult.confidence!,
+            browserSessionId: browserSessionId,
+          });
+
           const responseContent: Content = {
             thought: `Successfully identified user as ${identificationResult.match.userName} with confidence ${(identificationResult.confidence! * 100).toFixed(1)}%`,
-            text: `🎉 Welcome back, ${identificationResult.match.userName}!\n\nVoice identification successful with ${(identificationResult.confidence! * 100).toFixed(1)}% confidence.\n\nYour profile is now unlocked and ready for voice commands.`,
+            text: `🎉 Welcome back, ${identificationResult.match.userName}!\n\nVoice identification successful with ${(identificationResult.confidence! * 100).toFixed(1)}% confidence.\n\nYour profile is now unlocked and ready for voice commands. {"identificationSuccess":true,"identifiedUser":"${identificationResult.match.userName}","userId":"${identificationResult.match.userId}","confidence":${identificationResult.confidence},"browserSessionId":"${browserSessionId || 'none'}"}`,
             actions: ["IDENTIFY_VOICE"],
             metadata: {
               identificationSuccess: true,

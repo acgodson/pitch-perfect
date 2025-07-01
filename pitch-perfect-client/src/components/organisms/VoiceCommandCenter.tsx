@@ -14,6 +14,9 @@ interface VoiceCommandCenterProps {
   className?: string;
   isProcessing?: boolean;
   isProfileMatched?: boolean;
+  showSuccessIndicator?: boolean;
+  identifiedUser?: string | null;
+  onNavigateToActivity?: () => void;
 }
 
 export const VoiceCommandCenter = ({
@@ -21,6 +24,9 @@ export const VoiceCommandCenter = ({
   className,
   isProcessing = false,
   isProfileMatched = false,
+  showSuccessIndicator = false,
+  identifiedUser = null,
+  onNavigateToActivity,
 }: VoiceCommandCenterProps) => {
   const [isListening, setIsListening] = useState(false);
   const [stage, setStage] = useState<Stage>("waiting");
@@ -178,6 +184,9 @@ export const VoiceCommandCenter = ({
             // Profile matched state - green glow
             isProfileMatched &&
               "ring-4 ring-emerald-400/40 bg-emerald-400/8 border-emerald-400/25",
+            // Success indicator state - bright green glow with pulse
+            showSuccessIndicator &&
+              "ring-4 ring-emerald-300/60 bg-emerald-400/15 border-emerald-300/40 animate-pulse",
           )}
         >
           {/* Processing progress ring - positioned on the outer edge */}
@@ -232,12 +241,46 @@ export const VoiceCommandCenter = ({
 
           {/* Content overlay - clean and minimal */}
           <div className="absolute inset-0 flex flex-col items-center justify-center space-y-6 p-8 z-10">
-            <VoiceMicrophone
-              isListening={isListening}
-              onStartListening={startRecording}
-              onStopListening={stopRecording}
-              isProcessing={isProcessing}
-            />
+            {showSuccessIndicator ? (
+              /* Success indicator with green checkmark - clickable to navigate */
+              <button
+                onClick={onNavigateToActivity}
+                className="w-24 h-24 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 group cursor-pointer"
+                title="Click to continue to main activity"
+              >
+                <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"  
+                      strokeLinejoin="round"
+                      strokeWidth={3}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+              </button>
+            ) : (
+              <VoiceMicrophone
+                isListening={isListening}
+                onStartListening={startRecording}
+                onStopListening={stopRecording}
+                isProcessing={isProcessing}
+              />
+            )}
+            
+            {/* Show identified user name below success indicator */}
+            {showSuccessIndicator && identifiedUser && (
+              <div className="text-center">
+                <p className="text-white font-medium text-lg">Welcome back!</p>
+                <p className="text-emerald-300 font-semibold text-xl">{identifiedUser}</p>
+                <p className="text-white/60 text-sm mt-1">Click the checkmark to continue</p>
+              </div>
+            )}
           </div>
         </div>
 

@@ -233,11 +233,13 @@ ${
 export class VoiceEmbeddingService {
   private apiUrl: string;
   private timeout: number;
+  private runtime: IAgentRuntime;
 
   constructor(runtime: IAgentRuntime) {
     const config = getVoiceConfig(runtime);
     this.apiUrl = config.apiUrl;
     this.timeout = config.timeout;
+    this.runtime = runtime;
   }
 
   /**
@@ -306,14 +308,11 @@ export class VoiceEmbeddingService {
       // SYNC PATTERN: Sync localStorage to server before identification
       await voiceSyncManager.syncToServer();
 
-      // Use the configured API URL for voice registry endpoints
-      const registryUrl = this.apiUrl.replace("/voice", "/voice-registry");
+      // Use the correct voice registry URL
+      const registryUrl = typeof window !== "undefined" ? "/api/eliza/voice-registry" : "http://localhost:4000/api/eliza/voice-registry";
 
-      // Use session-based identification if browserSessionId is provided
-      const endpoint = browserSessionId ? "identify/session" : "identify";
-      const requestBody = browserSessionId 
-        ? { testEmbedding, threshold, browserSessionId }
-        : { testEmbedding, threshold };
+      const endpoint = "identify";
+      const requestBody = { testEmbedding, threshold };
 
       const response = await fetch(`${registryUrl}/${endpoint}`, {
         method: "POST",
